@@ -67,16 +67,28 @@
         }
 
         header h1 {
-            font-size: 1.5rem;
-            color: #555;
-            margin-bottom: 5px;
-            font-weight: 600;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a18cd1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(255, 154, 158, 0.3);
+            animation: bounce 2s ease-in-out infinite;
         }
 
-        header p {
-            font-size: 0.9rem;
-            color: #888;
+        header p.subtitle {
+            font-size: 1rem;
+            color: #a18cd1;
             margin-top: 0;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         /* 3D Flip Card */
@@ -343,8 +355,8 @@
     <div class="glass-container">
         <button class="reset-btn" onclick="重置进度()" title="重置进度">↻ Reset</button>
         <header>
-            <h1>超声词汇加油站</h1>
-            <p>Today is a good day to learn</p>
+            <h1>霖霖宝宝</h1>
+            <p class="subtitle">超声词汇学习</p>
         </header>
 
         <div class="card-scene" onclick="切换翻转()">
