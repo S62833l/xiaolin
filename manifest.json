@@ -2,7 +2,7 @@
   "name": "超声词汇加油站",
   "short_name": "超声词汇",
   "description": "超声医学词汇学习助手 - 661个专业词汇，智能记忆算法",
-  "start_url": "./小霖的超声词汇加油站_Web版.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#e94560",

@@ -1,32 +1,5903 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0;url=小霖的超声词汇加油站_Web版.html">
-    <title>超声词汇加油站 - 重定向中...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#e94560">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="超声词汇">
+    <title>小霖的超声词汇加油站</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
+        :root {
+            --primary-color: #ff9a9e;
+            --secondary-color: #fad0c4;
+            --accent-color: #a18cd1;
+            --text-color: #2d3436;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .glass-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow);
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
             text-align: center;
-            padding: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            position: relative;
+            z-index: 10;
         }
-        h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
+
+        header h1 {
+            font-size: 1.5rem;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
-        p {
-            font-size: 1.2em;
+
+        header p {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0;
+        }
+
+        /* 3D Flip Card */
+        .card-scene {
+            width: 100%;
+            height: 300px;
+            perspective: 1000px;
+            margin: 30px 0;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0) rotateY(180deg);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0) rotateY(180deg);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0) rotateY(180deg);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0) rotateY(180deg);
+            }
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #fff 0%, #f3f4f6 100%);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            transform: rotateY(180deg);
+            position: relative;
+        }
+
+        .word-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .word-meta {
+            font-size: 1rem;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .hint-text {
+            font-size: 0.8rem;
+            color: #ccc;
+            position: absolute;
+            bottom: 20px;
+        }
+
+        /* Buttons */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 0;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            color: #4CAF50;
+        }
+
+        .btn-warning {
+            color: #FF9800;
+        }
+
+        .btn-danger {
+            color: #F44336;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9a9e 0%, #a18cd1 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(-45deg,
+                    rgba(255, 255, 255, .2) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, .2) 50%,
+                    rgba(255, 255, 255, .2) 75%,
+                    transparent 75%,
+                    transparent);
+            z-index: 1;
+            background-size: 20px 20px;
+            animation: move 2s linear infinite;
+        }
+
+        @keyframes move {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 20px 20px;
+            }
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #999;
+            font-size: 0.8rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        .reset-btn:hover {
+            opacity: 1;
+            color: #ff6b6b;
+            transform: rotate(90deg);
+        }
+
+        .speak-btn {
+            margin-top: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #a18cd1;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+            padding: 5px;
+        }
+        .speak-btn:hover {
+            transform: scale(1.2);
+            color: #ff9a9e;
+        }
+        .speak-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* 通关庆祝动画 */
+        .celebration-text {
+            font-size: 2rem;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
     </style>
 </head>
+
 <body>
-    <h1>超声词汇加油站</h1>
-    <p>正在跳转到应用页面...如果没有自动跳转，请点击 <a href="小霖的超声词汇加油站_Web版.html" style="color: #fff; text-decoration: underline;">这里</a></p>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="glass-container">
+        <button class="reset-btn" onclick="重置进度()" title="重置进度">↻ Reset</button>
+        <header>
+            <h1>超声词汇加油站</h1>
+            <p>Today is a good day to learn</p>
+        </header>
+
+        <div class="card-scene" onclick="切换翻转()">
+            <div class="card" id="card">
+                <div class="card-face card-front">
+                    <div class="word-text" id="zh-text">加载中...</div>
+                    <div class="hint-text">点击查看答案</div>
+                </div>
+                <div class="card-face card-back">
+                    <div class="word-text" id="en-text">Loading...</div>
+                    <button class="speak-btn" onclick="播放发音(event)" title="点击发音">🔊</button>
+                    <div class="word-meta" id="meta-text">A · P.1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-success" onclick="处理结果(0)" title="记住了">✅</button>
+            <button class="btn btn-warning" onclick="处理结果(1)" title="模糊">🤔</button>
+            <button class="btn btn-danger" onclick="处理结果(2)" title="没见过">❌</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progress-count">0 / 0</span>
+                <span>已掌握</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据源 - 请将生成的 word_data.js 内容粘贴到这里 FULL_VOCABULARY 变量中 -->
     <script>
-        window.location.href = '小霖的超声词汇加油站_Web版.html';
+        // 示例数据，请替换为全量数据
+        let FULL_VOCABULARY = [
+  {
+    "id": 1,
+    "zh": "阿托品",
+    "en": "Atropine",
+    "idx": "A",
+    "pg": 375,
+    "w": 10
+  },
+  {
+    "id": 2,
+    "zh": "癌栓",
+    "en": "cancer thrombus",
+    "idx": "",
+    "pg": 213,
+    "w": 10
+  },
+  {
+    "id": 3,
+    "zh": "暗环",
+    "en": "dark ring",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 4,
+    "zh": "Budd-Chiari 综合征",
+    "en": "Budd-Chiari syndrome",
+    "idx": "B",
+    "pg": 236,
+    "w": 10
+  },
+  {
+    "id": 5,
+    "zh": "靶环征",
+    "en": "target sign",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 6,
+    "zh": "摆动式",
+    "en": "oscillator",
+    "idx": "",
+    "pg": 26,
+    "w": 10
+  },
+  {
+    "id": 7,
+    "zh": "斑片状回声",
+    "en": "echogenic spot",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 8,
+    "zh": "半月瓣",
+    "en": "semilunar valve",
+    "idx": "",
+    "pg": 46,
+    "w": 10
+  },
+  {
+    "id": 9,
+    "zh": "瓣叶",
+    "en": "valve leaflet",
+    "idx": "",
+    "pg": 45,
+    "w": 10
+  },
+  {
+    "id": 10,
+    "zh": "包裹性积液",
+    "en": "encapsulated effusion",
+    "idx": "",
+    "pg": 187,
+    "w": 10
+  },
+  {
+    "id": 11,
+    "zh": "包膜",
+    "en": "capsule",
+    "idx": "",
+    "pg": 211,
+    "w": 10
+  },
+  {
+    "id": 12,
+    "zh": "贲门",
+    "en": "cardia",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 13,
+    "zh": "边界回声",
+    "en": "border echo",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 14,
+    "zh": "边缘回声",
+    "en": "boundary echo",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 15,
+    "zh": "表皮样囊肿",
+    "en": "epidermoid cyst",
+    "idx": "",
+    "pg": 265,
+    "w": 10
+  },
+  {
+    "id": 16,
+    "zh": "下脂肪垫",
+    "en": "hoffa fatpad",
+    "idx": "",
+    "pg": 477,
+    "w": 10
+  },
+  {
+    "id": 17,
+    "zh": "玻璃体",
+    "en": "vitreous body",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 18,
+    "zh": "玻璃体后脱离",
+    "en": "posterior vitreous detachment, PVD",
+    "idx": "",
+    "pg": 452,
+    "w": 10
+  },
+  {
+    "id": 19,
+    "zh": "玻璃体积血",
+    "en": "vitreous hemorrhage",
+    "idx": "",
+    "pg": 451,
+    "w": 10
+  },
+  {
+    "id": 20,
+    "zh": "勃起功能障碍",
+    "en": "erectile dysfunction, ED",
+    "idx": "",
+    "pg": 336,
+    "w": 10
+  },
+  {
+    "id": 21,
+    "zh": "搏动指数",
+    "en": "pulsatility index, PI",
+    "idx": "",
+    "pg": 35,
+    "w": 10
+  },
+  {
+    "id": 22,
+    "zh": "Charcot",
+    "en": "Charcot",
+    "idx": "C",
+    "pg": 245,
+    "w": 10
+  },
+  {
+    "id": 23,
+    "zh": "采样容积",
+    "en": "sample volume, SV",
+    "idx": "",
+    "pg": 31,
+    "w": 10
+  },
+  {
+    "id": 24,
+    "zh": "彩色多普勒血流显像",
+    "en": "color Doppler flow imaging, CDFI",
+    "idx": "",
+    "pg": 31,
+    "w": 10
+  },
+  {
+    "id": 25,
+    "zh": "侧后声影",
+    "en": "posterior lateral acoustic shadow",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 26,
+    "zh": "侧脑室",
+    "en": "lateral ventricle",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 27,
+    "zh": "肠梗阻",
+    "en": "intestinal obstruction",
+    "idx": "",
+    "pg": 352,
+    "w": 10
+  },
+  {
+    "id": 28,
+    "zh": "肠套叠",
+    "en": "intussusception",
+    "idx": "",
+    "pg": 353,
+    "w": 10
+  },
+  {
+    "id": 29,
+    "zh": "常染色体显性遗传多囊肾",
+    "en": "autosomal dominant polycystic kidney disease, ADPKD",
+    "idx": "",
+    "pg": 296,
+    "w": 10
+  },
+  {
+    "id": 30,
+    "zh": "常染色体隐性遗传多囊肾",
+    "en": "autosomal recessive polycystic kidney disease, ARPKD",
+    "idx": "",
+    "pg": 296,
+    "w": 10
+  },
+  {
+    "id": 31,
+    "zh": "超声 Murphy 征",
+    "en": "Murphy sign",
+    "idx": "",
+    "pg": 243,
+    "w": 10
+  },
+  {
+    "id": 32,
+    "zh": "超声弹性成像",
+    "en": "elastography",
+    "idx": "",
+    "pg": 525,
+    "w": 10
+  },
+  {
+    "id": 33,
+    "zh": "超声二维斑点追踪成像",
+    "en": "two-dimensional speckle tracking imaging, STI",
+    "idx": "",
+    "pg": 529,
+    "w": 10
+  },
+  {
+    "id": 34,
+    "zh": "超声生物显微镜",
+    "en": "ultrasound biomicroscope, UBM",
+    "idx": "",
+    "pg": 455,
+    "w": 10
+  },
+  {
+    "id": 35,
+    "zh": "超声医学",
+    "en": "ultrasonic medicine",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 36,
+    "zh": "超声造影/对比增强超声",
+    "en": "contrast-enhanced ultrasound, CEUS",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 37,
+    "zh": "超声诊断学",
+    "en": "ultrasonic diagnosis",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 38,
+    "zh": "超声组织谐波成像",
+    "en": "tissue harmonic imaging, THI",
+    "idx": "",
+    "pg": 524,
+    "w": 10
+  },
+  {
+    "id": 39,
+    "zh": "重复肾",
+    "en": "duplex kidney",
+    "idx": "",
+    "pg": 307,
+    "w": 10
+  },
+  {
+    "id": 40,
+    "zh": "重复输尿管",
+    "en": "duplex ureter",
+    "idx": "",
+    "pg": 311,
+    "w": 10
+  },
+  {
+    "id": 41,
+    "zh": "耻骨联合",
+    "en": "symphysis pubica",
+    "idx": "",
+    "pg": 367,
+    "w": 10
+  },
+  {
+    "id": 42,
+    "zh": "川崎病",
+    "en": "Kawasaki disease, KD",
+    "idx": "",
+    "pg": 139,
+    "w": 10
+  },
+  {
+    "id": 43,
+    "zh": "穿刺式探头",
+    "en": "biopsy probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 44,
+    "zh": "垂直撕裂",
+    "en": "vertical tear",
+    "idx": "",
+    "pg": 485,
+    "w": 10
+  },
+  {
+    "id": 45,
+    "zh": "唇腭裂",
+    "en": "cleft lip and palate",
+    "idx": "",
+    "pg": 428,
+    "w": 10
+  },
+  {
+    "id": 46,
+    "zh": "磁共振成像",
+    "en": "magnetic resonance imaging, MRI",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 47,
+    "zh": "错构瘤",
+    "en": "hamartoma",
+    "idx": "",
+    "pg": 191,
+    "w": 10
+  },
+  {
+    "id": 48,
+    "zh": "大肠癌",
+    "en": "large intestinal carcinoma",
+    "idx": "D",
+    "pg": 350,
+    "w": 10
+  },
+  {
+    "id": 49,
+    "zh": "大动脉转位",
+    "en": "transposition of the great arteries, TGA",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 50,
+    "zh": "大脑",
+    "en": "cerebrum",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 51,
+    "zh": "大脑半球",
+    "en": "cerebral hemisphere",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 52,
+    "zh": "大脑导水管",
+    "en": "cerebral aqueduct",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 53,
+    "zh": "大脑镰",
+    "en": "falx cerebri",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 54,
+    "zh": "带状或线状回声",
+    "en": "echogenic band",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 55,
+    "zh": "单侧性肾缺如",
+    "en": "renal agenesis",
+    "idx": "",
+    "pg": 306,
+    "w": 10
+  },
+  {
+    "id": 56,
+    "zh": "单纯性结节性甲状腺肿",
+    "en": "simple nodular goiter",
+    "idx": "",
+    "pg": 464,
+    "w": 10
+  },
+  {
+    "id": 57,
+    "zh": "单纯性弥漫性甲状腺肿",
+    "en": "simple diffuse goiter",
+    "idx": "",
+    "pg": 463,
+    "w": 10
+  },
+  {
+    "id": 58,
+    "zh": "单光子计算机断层显像",
+    "en": "single photon emission computerized tomography, SPECT",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 59,
+    "zh": "单脐动脉",
+    "en": "single umbilical artery",
+    "idx": "",
+    "pg": 421,
+    "w": 10
+  },
+  {
+    "id": 60,
+    "zh": "胆道蛔虫病",
+    "en": "biliary ascarid",
+    "idx": "",
+    "pg": 256,
+    "w": 10
+  },
+  {
+    "id": 61,
+    "zh": "胆管结石",
+    "en": "bile duct stone",
+    "idx": "",
+    "pg": 252,
+    "w": 10
+  },
+  {
+    "id": 62,
+    "zh": "胆囊",
+    "en": "gallbladder",
+    "idx": "",
+    "pg": 239,
+    "w": 10
+  },
+  {
+    "id": 63,
+    "zh": "胆囊胆固醇沉着症",
+    "en": "cholesterosis of the gallbladder",
+    "idx": "",
+    "pg": 250,
+    "w": 10
+  },
+  {
+    "id": 64,
+    "zh": "胆囊结石",
+    "en": "gallbladder stone",
+    "idx": "",
+    "pg": 244,
+    "w": 10
+  },
+  {
+    "id": 65,
+    "zh": "胆囊良性腺瘤",
+    "en": "benign gallbladder adenoma",
+    "idx": "",
+    "pg": 249,
+    "w": 10
+  },
+  {
+    "id": 66,
+    "zh": "胆囊腺肌瘤病",
+    "en": "gallbladder adenomyomatosis",
+    "idx": "",
+    "pg": 251,
+    "w": 10
+  },
+  {
+    "id": 67,
+    "zh": "胆囊腺肌增生症",
+    "en": "gallbladder adenomyomatosis",
+    "idx": "",
+    "pg": 250,
+    "w": 10
+  },
+  {
+    "id": 68,
+    "zh": "胆囊增生性疾病",
+    "en": "gallbladder hyperplasia disease",
+    "idx": "",
+    "pg": 250,
+    "w": 10
+  },
+  {
+    "id": 69,
+    "zh": "等回声",
+    "en": "iso-echo",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 70,
+    "zh": "等容收缩时间",
+    "en": "isovolumetric contraction time, ICT",
+    "idx": "",
+    "pg": 79,
+    "w": 10
+  },
+  {
+    "id": 71,
+    "zh": "低回声",
+    "en": "hypoecho",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 72,
+    "zh": "第三脑室",
+    "en": "third ventricules",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 73,
+    "zh": "点状回声",
+    "en": "echogenic dots",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 74,
+    "zh": "电子相控阵型",
+    "en": "electronic phased array",
+    "idx": "",
+    "pg": 26,
+    "w": 10
+  },
+  {
+    "id": 75,
+    "zh": "靛青蓝绿",
+    "en": "indocyanine green",
+    "idx": "",
+    "pg": 65,
+    "w": 10
+  },
+  {
+    "id": 76,
+    "zh": "顶叶",
+    "en": "lobus parietalis",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 77,
+    "zh": "动静脉瘘",
+    "en": "arteriovenous fistula",
+    "idx": "",
+    "pg": 180,
+    "w": 10
+  },
+  {
+    "id": 78,
+    "zh": "动脉导管未闭",
+    "en": "patent ductus arteriosus, PDA",
+    "idx": "",
+    "pg": 105,
+    "w": 10
+  },
+  {
+    "id": 79,
+    "zh": "动脉瘤样骨囊肿",
+    "en": "aneurysmal bone cyst",
+    "idx": "",
+    "pg": 483,
+    "w": 10
+  },
+  {
+    "id": 80,
+    "zh": "动脉硬化性闭塞症",
+    "en": "arteriosclerosis obliterans",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 81,
+    "zh": "毒性弥漫性甲状腺肿",
+    "en": "toxic diffuse goiter",
+    "idx": "",
+    "pg": 463,
+    "w": 10
+  },
+  {
+    "id": 82,
+    "zh": "对比超声心动图",
+    "en": "contrast echocardiography",
+    "idx": "",
+    "pg": 65,
+    "w": 10
+  },
+  {
+    "id": 83,
+    "zh": "对比增强超声显像技术",
+    "en": "contrast-enhanced ultrasonography, CEUS",
+    "idx": "",
+    "pg": 513,
+    "w": 10
+  },
+  {
+    "id": 84,
+    "zh": "多彩镶嵌图像",
+    "en": "mosaic pattern",
+    "idx": "",
+    "pg": 62,
+    "w": 10
+  },
+  {
+    "id": 85,
+    "zh": "多发性大动脉炎",
+    "en": "multiple arteritis",
+    "idx": "",
+    "pg": 168,
+    "w": 10
+  },
+  {
+    "id": 86,
+    "zh": "多囊卵巢",
+    "en": "polycystic ovary",
+    "idx": "",
+    "pg": 384,
+    "w": 10
+  },
+  {
+    "id": 87,
+    "zh": "多囊性肾发育异常",
+    "en": "multicystic dysplasia kidney, MCDK",
+    "idx": "",
+    "pg": 297,
+    "w": 10
+  },
+  {
+    "id": 88,
+    "zh": "多普勒超声",
+    "en": "Doppler, D型",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 89,
+    "zh": "多普勒超声心动图",
+    "en": "Doppler echocardiography",
+    "idx": "",
+    "pg": 60,
+    "w": 10
+  },
+  {
+    "id": 90,
+    "zh": "多普勒效应",
+    "en": "Doppler effect",
+    "idx": "",
+    "pg": 61,
+    "w": 10
+  },
+  {
+    "id": 91,
+    "zh": "多胎妊娠",
+    "en": "multiple pregnancy",
+    "idx": "",
+    "pg": 406,
+    "w": 10
+  },
+  {
+    "id": 92,
+    "zh": "EF 斜率",
+    "en": "EF slope",
+    "idx": "E",
+    "pg": 83,
+    "w": 10
+  },
+  {
+    "id": 93,
+    "zh": "额叶",
+    "en": "lobus frontalis",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 94,
+    "zh": "恶性畸胎瘤",
+    "en": "malignant teratoma",
+    "idx": "",
+    "pg": 361,
+    "w": 10
+  },
+  {
+    "id": 95,
+    "zh": "恶性淋巴瘤",
+    "en": "malignant lyphoma",
+    "idx": "",
+    "pg": 360,
+    "w": 10
+  },
+  {
+    "id": 96,
+    "zh": "二尖瓣",
+    "en": "mitral valve",
+    "idx": "",
+    "pg": 46,
+    "w": 10
+  },
+  {
+    "id": 97,
+    "zh": "二尖瓣波群",
+    "en": "echo pattern of the mitral valve",
+    "idx": "",
+    "pg": 55,
+    "w": 10
+  },
+  {
+    "id": 98,
+    "zh": "二尖瓣关闭不全",
+    "en": "mitral regurgitation",
+    "idx": "",
+    "pg": 85,
+    "w": 10
+  },
+  {
+    "id": 99,
+    "zh": "二尖瓣后叶曲线",
+    "en": "echo curve of the posterior mitral valve",
+    "idx": "",
+    "pg": 56,
+    "w": 10
+  },
+  {
+    "id": 100,
+    "zh": "二尖瓣前叶曲线",
+    "en": "echo curve of the anterior mitral valve",
+    "idx": "",
+    "pg": 56,
+    "w": 10
+  },
+  {
+    "id": 101,
+    "zh": "二尖瓣狭窄",
+    "en": "mitral stenosis",
+    "idx": "",
+    "pg": 82,
+    "w": 10
+  },
+  {
+    "id": 102,
+    "zh": "二维超声",
+    "en": "two dimensional ultrasound",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 103,
+    "zh": "二心房切面",
+    "en": "bi-atrial view",
+    "idx": "",
+    "pg": 72,
+    "w": 10
+  },
+  {
+    "id": 104,
+    "zh": "乏特",
+    "en": "Vater",
+    "idx": "F",
+    "pg": 239,
+    "w": 10
+  },
+  {
+    "id": 105,
+    "zh": "法洛四联症",
+    "en": "tetralogy of Fallot, FOT",
+    "idx": "",
+    "pg": 108,
+    "w": 10
+  },
+  {
+    "id": 106,
+    "zh": "房间隔",
+    "en": "interatrial septum",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 107,
+    "zh": "房间隔缺损",
+    "en": "atrial septal defects, ASD",
+    "idx": "",
+    "pg": 98,
+    "w": 10
+  },
+  {
+    "id": 108,
+    "zh": "房室管缺损",
+    "en": "atrioventricular canal defect, AVCD",
+    "idx": "",
+    "pg": 111,
+    "w": 10
+  },
+  {
+    "id": 109,
+    "zh": "房室间隔缺损",
+    "en": "atrioventricular septal defect, AVSD",
+    "idx": "",
+    "pg": 111,
+    "w": 10
+  },
+  {
+    "id": 110,
+    "zh": "房水",
+    "en": "aqueous humor",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 111,
+    "zh": "肥厚型心肌病",
+    "en": "hypertrophy cardiomyopathy",
+    "idx": "",
+    "pg": 121,
+    "w": 10
+  },
+  {
+    "id": 112,
+    "zh": "肺",
+    "en": "lung",
+    "idx": "",
+    "pg": 182,
+    "w": 10
+  },
+  {
+    "id": 113,
+    "zh": "肺癌",
+    "en": "bronchogenic carcinoma",
+    "idx": "",
+    "pg": 189,
+    "w": 10
+  },
+  {
+    "id": 114,
+    "zh": "肺不张",
+    "en": "atelectasis",
+    "idx": "",
+    "pg": 194,
+    "w": 10
+  },
+  {
+    "id": 115,
+    "zh": "肺底积液",
+    "en": "infrapulmonary pleural effusion",
+    "idx": "",
+    "pg": 187,
+    "w": 10
+  },
+  {
+    "id": 116,
+    "zh": "肺动脉",
+    "en": "pulmonary artery, PA",
+    "idx": "",
+    "pg": 80,
+    "w": 10
+  },
+  {
+    "id": 117,
+    "zh": "肺动脉瓣",
+    "en": "pulmonary valve",
+    "idx": "",
+    "pg": 52,
+    "w": 10
+  },
+  {
+    "id": 118,
+    "zh": "肺动脉瓣关闭不全",
+    "en": "pulmonary regurgitation",
+    "idx": "",
+    "pg": 96,
+    "w": 10
+  },
+  {
+    "id": 119,
+    "zh": "肺动脉瓣狭窄",
+    "en": "pulmonary stenosis",
+    "idx": "",
+    "pg": 94,
+    "w": 10
+  },
+  {
+    "id": 120,
+    "zh": "肺动脉波群",
+    "en": "echo pattern of the pulmonary valve",
+    "idx": "",
+    "pg": 57,
+    "w": 10
+  },
+  {
+    "id": 121,
+    "zh": "肺隔离症",
+    "en": "pulmonary sequestration",
+    "idx": "",
+    "pg": 193,
+    "w": 10
+  },
+  {
+    "id": 122,
+    "zh": "肺结核",
+    "en": "pulmonary tuberculosis",
+    "idx": "",
+    "pg": 192,
+    "w": 10
+  },
+  {
+    "id": 123,
+    "zh": "肺囊肿",
+    "en": "pulmonary cyst",
+    "idx": "",
+    "pg": 191,
+    "w": 10
+  },
+  {
+    "id": 124,
+    "zh": "肺脓肿",
+    "en": "lung abscess",
+    "idx": "",
+    "pg": 192,
+    "w": 10
+  },
+  {
+    "id": 125,
+    "zh": "肺炎",
+    "en": "pneumonia",
+    "idx": "",
+    "pg": 193,
+    "w": 10
+  },
+  {
+    "id": 126,
+    "zh": "峰值射血率",
+    "en": "peak velocity ejection fracton, PER",
+    "idx": "",
+    "pg": 79,
+    "w": 10
+  },
+  {
+    "id": 127,
+    "zh": "佛氏窦",
+    "en": "Valsalva",
+    "idx": "",
+    "pg": 46,
+    "w": 10
+  },
+  {
+    "id": 128,
+    "zh": "负荷超声心动图",
+    "en": "stress echocardiography, SE",
+    "idx": "",
+    "pg": 135,
+    "w": 10
+  },
+  {
+    "id": 129,
+    "zh": "附睾",
+    "en": "epididymis",
+    "idx": "",
+    "pg": 328,
+    "w": 10
+  },
+  {
+    "id": 130,
+    "zh": "附睾炎",
+    "en": "epididymitis",
+    "idx": "",
+    "pg": 331,
+    "w": 10
+  },
+  {
+    "id": 131,
+    "zh": "副脾",
+    "en": "splenulus",
+    "idx": "",
+    "pg": 260,
+    "w": 10
+  },
+  {
+    "id": 132,
+    "zh": "腹裂",
+    "en": "gastroschisis",
+    "idx": "",
+    "pg": 433,
+    "w": 10
+  },
+  {
+    "id": 133,
+    "zh": "腹膜后血肿",
+    "en": "retroperitoneal hematoma",
+    "idx": "",
+    "pg": 362,
+    "w": 10
+  },
+  {
+    "id": 134,
+    "zh": "腹腔镜超声探头",
+    "en": "laparoscopic probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 135,
+    "zh": "腹腔妊娠",
+    "en": "abdominal pregnancy",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 136,
+    "zh": "腹围",
+    "en": "abdomen circumference, AC",
+    "idx": "",
+    "pg": 404,
+    "w": 10
+  },
+  {
+    "id": 137,
+    "zh": "Gerbode 缺损",
+    "en": "Gerbode defect",
+    "idx": "G",
+    "pg": 112,
+    "w": 10
+  },
+  {
+    "id": 138,
+    "zh": "肝包虫病",
+    "en": "hepatic echinococcosis",
+    "idx": "",
+    "pg": 223,
+    "w": 10
+  },
+  {
+    "id": 139,
+    "zh": "肝静脉淤血",
+    "en": "hepatic venous congestion",
+    "idx": "",
+    "pg": 235,
+    "w": 10
+  },
+  {
+    "id": 140,
+    "zh": "肝局灶性结节性增生",
+    "en": "focal nodular hyperplasia, FNH",
+    "idx": "",
+    "pg": 225,
+    "w": 10
+  },
+  {
+    "id": 141,
+    "zh": "肝囊肿",
+    "en": "hepatic cyst",
+    "idx": "",
+    "pg": 221,
+    "w": 10
+  },
+  {
+    "id": 142,
+    "zh": "肝内胆管结石",
+    "en": "intrahepatic stone",
+    "idx": "",
+    "pg": 253,
+    "w": 10
+  },
+  {
+    "id": 143,
+    "zh": "肝脓肿",
+    "en": "liver abscess",
+    "idx": "",
+    "pg": 222,
+    "w": 10
+  },
+  {
+    "id": 144,
+    "zh": "肝肾隐窝",
+    "en": "hepato-renal fossa",
+    "idx": "",
+    "pg": 199,
+    "w": 10
+  },
+  {
+    "id": 145,
+    "zh": "肝细胞性肝癌",
+    "en": "hepatocellular carcinoma, HCC",
+    "idx": "",
+    "pg": 210,
+    "w": 10
+  },
+  {
+    "id": 146,
+    "zh": "肝细胞性腺瘤",
+    "en": "hepatic adenoma, HA",
+    "idx": "",
+    "pg": 226,
+    "w": 10
+  },
+  {
+    "id": 147,
+    "zh": "肝血管瘤",
+    "en": "hepatic hemangioma",
+    "idx": "",
+    "pg": 218,
+    "w": 10
+  },
+  {
+    "id": 148,
+    "zh": "肝硬化",
+    "en": "cirrhosis",
+    "idx": "",
+    "pg": 228,
+    "w": 10
+  },
+  {
+    "id": 149,
+    "zh": "肝脏超声造影",
+    "en": "liver ultrasonic contrast, LUC",
+    "idx": "",
+    "pg": 524,
+    "w": 10
+  },
+  {
+    "id": 150,
+    "zh": "高回声",
+    "en": "hyper echo",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 151,
+    "zh": "高强度聚焦超声",
+    "en": "high intensity focused ultrasound, HIFU",
+    "idx": "",
+    "pg": 504,
+    "w": 10
+  },
+  {
+    "id": 152,
+    "zh": "睾丸",
+    "en": "testis",
+    "idx": "",
+    "pg": 328,
+    "w": 10
+  },
+  {
+    "id": 153,
+    "zh": "睾丸扭转",
+    "en": "testicular torsion",
+    "idx": "",
+    "pg": 333,
+    "w": 10
+  },
+  {
+    "id": 154,
+    "zh": "睾丸炎",
+    "en": "testitis",
+    "idx": "",
+    "pg": 331,
+    "w": 10
+  },
+  {
+    "id": 155,
+    "zh": "睾丸肿瘤",
+    "en": "testis tumor",
+    "idx": "",
+    "pg": 330,
+    "w": 10
+  },
+  {
+    "id": 156,
+    "zh": "宫颈",
+    "en": "cervix oteri",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 157,
+    "zh": "宫颈妊娠",
+    "en": "cervical pregnancy",
+    "idx": "",
+    "pg": 410,
+    "w": 10
+  },
+  {
+    "id": 158,
+    "zh": "宫内节育器",
+    "en": "intrauterine device, IUD",
+    "idx": "",
+    "pg": 382,
+    "w": 10
+  },
+  {
+    "id": 159,
+    "zh": "官腔",
+    "en": "uterine cavity",
+    "idx": "",
+    "pg": 370,
+    "w": 10
+  },
+  {
+    "id": 160,
+    "zh": "巩膜",
+    "en": "sclera",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 161,
+    "zh": "共同房室管",
+    "en": "common atrioventricular canal, CAVC",
+    "idx": "",
+    "pg": 111,
+    "w": 10
+  },
+  {
+    "id": 162,
+    "zh": "共同入口",
+    "en": "common-inlet",
+    "idx": "",
+    "pg": 51,
+    "w": 10
+  },
+  {
+    "id": 163,
+    "zh": "孤立性骨囊肿",
+    "en": "solitary bone cyst",
+    "idx": "",
+    "pg": 482,
+    "w": 10
+  },
+  {
+    "id": 164,
+    "zh": "股骨长度",
+    "en": "femur length, FL",
+    "idx": "",
+    "pg": 404,
+    "w": 10
+  },
+  {
+    "id": 165,
+    "zh": "骨巨细胞瘤",
+    "en": "giant cell tumor",
+    "idx": "",
+    "pg": 481,
+    "w": 10
+  },
+  {
+    "id": 166,
+    "zh": "骨肉瘤",
+    "en": "osteosarcoma",
+    "idx": "",
+    "pg": 478,
+    "w": 10
+  },
+  {
+    "id": 167,
+    "zh": "骨软骨瘤",
+    "en": "osteochondroma",
+    "idx": "",
+    "pg": 481,
+    "w": 10
+  },
+  {
+    "id": 168,
+    "zh": "骨纤维异样增殖症",
+    "en": "fibrous dysplasia of bone",
+    "idx": "",
+    "pg": 483,
+    "w": 10
+  },
+  {
+    "id": 169,
+    "zh": "固有肌层",
+    "en": "gastric muscular layers",
+    "idx": "",
+    "pg": 339,
+    "w": 10
+  },
+  {
+    "id": 170,
+    "zh": "冠状动脉瘘",
+    "en": "coronary artery fistula, CAF",
+    "idx": "",
+    "pg": 137,
+    "w": 10
+  },
+  {
+    "id": 171,
+    "zh": "冠状动脉粥样硬化性心脏病",
+    "en": "coronary atherosclerotic heart disease, CHD",
+    "idx": "",
+    "pg": 129,
+    "w": 10
+  },
+  {
+    "id": 172,
+    "zh": "冠状窦瓣",
+    "en": "thebesian valve",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 173,
+    "zh": "冠状窦型",
+    "en": "coronary sinus type",
+    "idx": "",
+    "pg": 98,
+    "w": 10
+  },
+  {
+    "id": 174,
+    "zh": "冠状面扫查",
+    "en": "coronary scan",
+    "idx": "",
+    "pg": 29,
+    "w": 10
+  },
+  {
+    "id": 175,
+    "zh": "哈氏",
+    "en": "Hartman",
+    "idx": "H",
+    "pg": 239,
+    "w": 10
+  },
+  {
+    "id": 176,
+    "zh": "海绵状血管瘤",
+    "en": "cavernous hemangioma",
+    "idx": "",
+    "pg": 453,
+    "w": 10
+  },
+  {
+    "id": 177,
+    "zh": "横膈",
+    "en": "horizontal fissura",
+    "idx": "",
+    "pg": 182,
+    "w": 10
+  },
+  {
+    "id": 178,
+    "zh": "横结肠",
+    "en": "colon transversum",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 179,
+    "zh": "横向扫查",
+    "en": "transverse scan",
+    "idx": "",
+    "pg": 29,
+    "w": 10
+  },
+  {
+    "id": 180,
+    "zh": "后方回声",
+    "en": "posterior echo",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 181,
+    "zh": "后交叉韧带",
+    "en": "posterior collateral ligament, PCL",
+    "idx": "",
+    "pg": 477,
+    "w": 10
+  },
+  {
+    "id": 182,
+    "zh": "华支睾吸虫",
+    "en": "clonorchiasis",
+    "idx": "",
+    "pg": 233,
+    "w": 10
+  },
+  {
+    "id": 183,
+    "zh": "化脓性胸膜炎 简称脓胸",
+    "en": "suppurative pleurisy",
+    "idx": "",
+    "pg": 187,
+    "w": 10
+  },
+  {
+    "id": 184,
+    "zh": "环状回声",
+    "en": "echogenic ring",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 185,
+    "zh": "黃素囊肿",
+    "en": "theca lutein cyst",
+    "idx": "",
+    "pg": 384,
+    "w": 10
+  },
+  {
+    "id": 186,
+    "zh": "黄体囊肿",
+    "en": "corpus luteum cyst",
+    "idx": "",
+    "pg": 383,
+    "w": 10
+  },
+  {
+    "id": 187,
+    "zh": "灰标",
+    "en": "mark of gray scale",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 188,
+    "zh": "灰度",
+    "en": "gray",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 189,
+    "zh": "灰阶",
+    "en": "gray scale",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 190,
+    "zh": "灰阶超声",
+    "en": "brightness modulation",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 191,
+    "zh": "回肠",
+    "en": "ileum",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 192,
+    "zh": "回声环",
+    "en": "echogenic ring",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 193,
+    "zh": "回声增强效应",
+    "en": "echo enhancement effect",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 194,
+    "zh": "彗星尾征",
+    "en": "comet-tail sign",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 195,
+    "zh": "混叠现象",
+    "en": "aliasing",
+    "idx": "",
+    "pg": 31,
+    "w": 10
+  },
+  {
+    "id": 196,
+    "zh": "机械扇形探头",
+    "en": "mechanical sector probe",
+    "idx": "J",
+    "pg": 26,
+    "w": 10
+  },
+  {
+    "id": 197,
+    "zh": "肌壁间肌瘤",
+    "en": "intramural myoma",
+    "idx": "",
+    "pg": 377,
+    "w": 10
+  },
+  {
+    "id": 198,
+    "zh": "畸胎瘤",
+    "en": "Teratoma",
+    "idx": "",
+    "pg": 194,
+    "w": 10
+  },
+  {
+    "id": 199,
+    "zh": "激光消融",
+    "en": "laser ablation",
+    "idx": "",
+    "pg": 504,
+    "w": 10
+  },
+  {
+    "id": 200,
+    "zh": "急性胆囊炎",
+    "en": "acute cholecystitis",
+    "idx": "",
+    "pg": 242,
+    "w": 10
+  },
+  {
+    "id": 201,
+    "zh": "急性阑尾炎",
+    "en": "acute appendicitis",
+    "idx": "",
+    "pg": 355,
+    "w": 10
+  },
+  {
+    "id": 202,
+    "zh": "急性淋巴结炎",
+    "en": "acute lymphadenitis",
+    "idx": "",
+    "pg": 470,
+    "w": 10
+  },
+  {
+    "id": 203,
+    "zh": "急性肾小球性肾炎",
+    "en": "acute glomerular nephritis",
+    "idx": "",
+    "pg": 309,
+    "w": 10
+  },
+  {
+    "id": 204,
+    "zh": "急性胰腺炎",
+    "en": "acute pancreatitis",
+    "idx": "",
+    "pg": 280,
+    "w": 10
+  },
+  {
+    "id": 205,
+    "zh": "脊髓",
+    "en": "spinal cord",
+    "idx": "",
+    "pg": 40,
+    "w": 10
+  },
+  {
+    "id": 206,
+    "zh": "脊柱裂",
+    "en": "spina bifida",
+    "idx": "",
+    "pg": 426,
+    "w": 10
+  },
+  {
+    "id": 207,
+    "zh": "继发孔型",
+    "en": "secundum type",
+    "idx": "",
+    "pg": 98,
+    "w": 10
+  },
+  {
+    "id": 208,
+    "zh": "甲状旁腺",
+    "en": "parathyroid",
+    "idx": "",
+    "pg": 461,
+    "w": 10
+  },
+  {
+    "id": 209,
+    "zh": "甲状旁腺腺瘤",
+    "en": "parathyrocele",
+    "idx": "",
+    "pg": 467,
+    "w": 10
+  },
+  {
+    "id": 210,
+    "zh": "甲状腺",
+    "en": "thyroid",
+    "idx": "",
+    "pg": 461,
+    "w": 10
+  },
+  {
+    "id": 211,
+    "zh": "甲状腺癌",
+    "en": "thyroid carcinoma",
+    "idx": "",
+    "pg": 466,
+    "w": 10
+  },
+  {
+    "id": 212,
+    "zh": "假肾征",
+    "en": "pseudo-kidney sign",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 213,
+    "zh": "假性动脉瘤",
+    "en": "pseudoaneurysm",
+    "idx": "",
+    "pg": 169,
+    "w": 10
+  },
+  {
+    "id": 214,
+    "zh": "假性脾囊肿",
+    "en": "splenic pseudocyst",
+    "idx": "",
+    "pg": 266,
+    "w": 10
+  },
+  {
+    "id": 215,
+    "zh": "尖峰圆顶状",
+    "en": "spike and dome",
+    "idx": "",
+    "pg": 122,
+    "w": 10
+  },
+  {
+    "id": 216,
+    "zh": "间皮瘤",
+    "en": "mesothelioma",
+    "idx": "",
+    "pg": 188,
+    "w": 10
+  },
+  {
+    "id": 217,
+    "zh": "剪切波弹性成像",
+    "en": "shear wave elastography",
+    "idx": "",
+    "pg": 5,
+    "w": 10
+  },
+  {
+    "id": 218,
+    "zh": "剑突下区",
+    "en": "subcostal area",
+    "idx": "",
+    "pg": 58,
+    "w": 10
+  },
+  {
+    "id": 219,
+    "zh": "剑突下四腔观",
+    "en": "subcostal four chamber view",
+    "idx": "",
+    "pg": 60,
+    "w": 10
+  },
+  {
+    "id": 220,
+    "zh": "腱索",
+    "en": "chordae tendineae",
+    "idx": "",
+    "pg": 45,
+    "w": 10
+  },
+  {
+    "id": 221,
+    "zh": "浆膜层",
+    "en": "serosa layers",
+    "idx": "",
+    "pg": 339,
+    "w": 10
+  },
+  {
+    "id": 222,
+    "zh": "浆膜下肌瘤",
+    "en": "subserous myoma",
+    "idx": "",
+    "pg": 377,
+    "w": 10
+  },
+  {
+    "id": 223,
+    "zh": "浆液性囊腺癌",
+    "en": "serous cystadenocarcinoma",
+    "idx": "",
+    "pg": 388,
+    "w": 10
+  },
+  {
+    "id": 224,
+    "zh": "浆液性囊腺瘤",
+    "en": "serous cystadenoma",
+    "idx": "",
+    "pg": 387,
+    "w": 10
+  },
+  {
+    "id": 225,
+    "zh": "降主动脉长轴切面",
+    "en": "long axis view of descending aorta",
+    "idx": "",
+    "pg": 74,
+    "w": 10
+  },
+  {
+    "id": 226,
+    "zh": "角膜",
+    "en": "cornea",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 227,
+    "zh": "角切迹",
+    "en": "incisura angularis",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 228,
+    "zh": "矫正型大动脉转位",
+    "en": "corrected transposition of the great arteries",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 229,
+    "zh": "节段诊断法",
+    "en": "segmental diagnosis",
+    "idx": "",
+    "pg": 49,
+    "w": 10
+  },
+  {
+    "id": 230,
+    "zh": "结核性盆腔炎",
+    "en": "tuberculosis pelvic inflammation",
+    "idx": "",
+    "pg": 396,
+    "w": 10
+  },
+  {
+    "id": 231,
+    "zh": "结膜",
+    "en": "conjunctiva",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 232,
+    "zh": "睫状后长动脉",
+    "en": "posterior ciliary artery long PCAI",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 233,
+    "zh": "睫状后短动脉",
+    "en": "posterior ciliary artery short PCAS",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 234,
+    "zh": "睫状体脱离",
+    "en": "cyclodialysis",
+    "idx": "",
+    "pg": 455,
+    "w": 10
+  },
+  {
+    "id": 235,
+    "zh": "介入性超声",
+    "en": "interventional ultrasound",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 236,
+    "zh": "界沟",
+    "en": "sulcus terminalis",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 237,
+    "zh": "界嵴",
+    "en": "crista terminalis",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 238,
+    "zh": "经尿道探头",
+    "en": "transurethral probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 239,
+    "zh": "经皮胆管穿刺引流术",
+    "en": "percutaneous transhepatic biliary drainage, PTBD",
+    "idx": "",
+    "pg": 502,
+    "w": 10
+  },
+  {
+    "id": 240,
+    "zh": "经皮经肝穿刺造影",
+    "en": "percutaneous transhepatic cholangiography, PTC",
+    "idx": "",
+    "pg": 501,
+    "w": 10
+  },
+  {
+    "id": 241,
+    "zh": "经食管超声心动图",
+    "en": "transesophageal echocardiography, TEE",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 242,
+    "zh": "经食管探头",
+    "en": "transesophageal probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 243,
+    "zh": "经胸超声心动图",
+    "en": "transthoracic echocardiography, TTE",
+    "idx": "",
+    "pg": 70,
+    "w": 10
+  },
+  {
+    "id": 244,
+    "zh": "经阴道探头",
+    "en": "transvaginal probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 245,
+    "zh": "经直肠探头",
+    "en": "transrectal probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 246,
+    "zh": "晶状体",
+    "en": "lens",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 247,
+    "zh": "精索静脉曲张",
+    "en": "varicocele, VC",
+    "idx": "",
+    "pg": 334,
+    "w": 10
+  },
+  {
+    "id": 248,
+    "zh": "颈动脉瘤",
+    "en": "carotid aneurysm",
+    "idx": "",
+    "pg": 169,
+    "w": 10
+  },
+  {
+    "id": 249,
+    "zh": "颈内动脉",
+    "en": "internal jugular artery",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 250,
+    "zh": "颈内静脉",
+    "en": "internal jugular vein",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 251,
+    "zh": "颈外动脉",
+    "en": "external carotid artery",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 252,
+    "zh": "颈总动脉",
+    "en": "common carotid artery",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 253,
+    "zh": "径线",
+    "en": "diameter",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 254,
+    "zh": "胫骨结节骨软骨病",
+    "en": "osteochondrosis of tibial tuberosity",
+    "idx": "",
+    "pg": 486,
+    "w": 10
+  },
+  {
+    "id": 255,
+    "zh": "静脉窦型",
+    "en": "sinus venous type",
+    "idx": "",
+    "pg": 98,
+    "w": 10
+  },
+  {
+    "id": 256,
+    "zh": "蝌蚪尾征",
+    "en": "tadpole tail sign",
+    "idx": "K",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 257,
+    "zh": "空肠",
+    "en": "jejunum",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 258,
+    "zh": "空间-时间相关成像技术",
+    "en": "spatio-temporal image correlation, STIC",
+    "idx": "",
+    "pg": 440,
+    "w": 10
+  },
+  {
+    "id": 259,
+    "zh": "跨壁速度梯度",
+    "en": "myocardial velocity gradient, MVG",
+    "idx": "",
+    "pg": 64,
+    "w": 10
+  },
+  {
+    "id": 260,
+    "zh": "快闪伪像",
+    "en": "twinkling artifact",
+    "idx": "",
+    "pg": 311,
+    "w": 10
+  },
+  {
+    "id": 261,
+    "zh": "髋臼效应",
+    "en": "effects of acetabulum",
+    "idx": "",
+    "pg": 369,
+    "w": 10
+  },
+  {
+    "id": 262,
+    "zh": "扩张型心肌病",
+    "en": "congestive cardiomyopathy",
+    "idx": "",
+    "pg": 120,
+    "w": 10
+  },
+  {
+    "id": 263,
+    "zh": "莨菪碱",
+    "en": "scopolamine",
+    "idx": "L",
+    "pg": 375,
+    "w": 10
+  },
+  {
+    "id": 264,
+    "zh": "老年性瓣膜病",
+    "en": "senile valvular diseases",
+    "idx": "",
+    "pg": 97,
+    "w": 10
+  },
+  {
+    "id": 265,
+    "zh": "泪器",
+    "en": "lacrimal apparatus",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 266,
+    "zh": "泪腺",
+    "en": "lacrimal gland",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 267,
+    "zh": "泪腺混合瘤",
+    "en": "mixed tumor of lacrimal gland",
+    "idx": "",
+    "pg": 454,
+    "w": 10
+  },
+  {
+    "id": 268,
+    "zh": "泪腺良性多形性腺瘤",
+    "en": "benign pleomorphic adenoma of lacrimal gland",
+    "idx": "",
+    "pg": 454,
+    "w": 10
+  },
+  {
+    "id": 269,
+    "zh": "冷冻治疗",
+    "en": "cryoablation",
+    "idx": "",
+    "pg": 504,
+    "w": 10
+  },
+  {
+    "id": 270,
+    "zh": "连续多普勒",
+    "en": "continuous wave Doppler, CW",
+    "idx": "",
+    "pg": 31,
+    "w": 10
+  },
+  {
+    "id": 271,
+    "zh": "淋巴瘤",
+    "en": "lymphoma",
+    "idx": "",
+    "pg": 196,
+    "w": 10
+  },
+  {
+    "id": 272,
+    "zh": "灵敏度",
+    "en": "sensitivity",
+    "idx": "",
+    "pg": 58,
+    "w": 10
+  },
+  {
+    "id": 273,
+    "zh": "流产",
+    "en": "abortion",
+    "idx": "",
+    "pg": 411,
+    "w": 10
+  },
+  {
+    "id": 274,
+    "zh": "滤泡囊肿",
+    "en": "follicular cyst",
+    "idx": "",
+    "pg": 383,
+    "w": 10
+  },
+  {
+    "id": 275,
+    "zh": "卵巢",
+    "en": "ovary",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 276,
+    "zh": "卵巢癌",
+    "en": "ovarian cancer",
+    "idx": "",
+    "pg": 393,
+    "w": 10
+  },
+  {
+    "id": 277,
+    "zh": "卵巢动脉",
+    "en": "arteria ovarian",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 278,
+    "zh": "卵巢积脓",
+    "en": "ovarian abscess",
+    "idx": "",
+    "pg": 395,
+    "w": 10
+  },
+  {
+    "id": 279,
+    "zh": "卵巢囊性畸胎瘤",
+    "en": "cystic teratoma",
+    "idx": "",
+    "pg": 386,
+    "w": 10
+  },
+  {
+    "id": 280,
+    "zh": "卵巢妊娠",
+    "en": "ovarian pregnancy",
+    "idx": "",
+    "pg": 410,
+    "w": 10
+  },
+  {
+    "id": 281,
+    "zh": "卵巢纤维瘤",
+    "en": "fibroma of ovary",
+    "idx": "",
+    "pg": 392,
+    "w": 10
+  },
+  {
+    "id": 282,
+    "zh": "卵巢子宫内膜异位囊肿",
+    "en": "ovarian endometriosis cyst",
+    "idx": "",
+    "pg": 385,
+    "w": 10
+  },
+  {
+    "id": 283,
+    "zh": "卵黄囊",
+    "en": "yolk sac",
+    "idx": "",
+    "pg": 401,
+    "w": 10
+  },
+  {
+    "id": 284,
+    "zh": "卵圆孔未闭",
+    "en": "patent foramen ovale, PFO",
+    "idx": "",
+    "pg": 100,
+    "w": 10
+  },
+  {
+    "id": 285,
+    "zh": "罗-阿氏窦",
+    "en": "Rokitansky-Aschoff sinuses, RAS",
+    "idx": "",
+    "pg": 251,
+    "w": 10
+  },
+  {
+    "id": 286,
+    "zh": "Marfan 综合征",
+    "en": "Marfan's syndrome",
+    "idx": "M",
+    "pg": 151,
+    "w": 10
+  },
+  {
+    "id": 287,
+    "zh": "M型超声",
+    "en": "motion-mode",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 288,
+    "zh": "M型超声心动图",
+    "en": "M-mode echocardiography",
+    "idx": "",
+    "pg": 54,
+    "w": 10
+  },
+  {
+    "id": 289,
+    "zh": "麦格综合征",
+    "en": "Meigs syndrome",
+    "idx": "",
+    "pg": 392,
+    "w": 10
+  },
+  {
+    "id": 290,
+    "zh": "麦氏点",
+    "en": "McBurney",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 291,
+    "zh": "脉冲多普勒",
+    "en": "pulsed wave Doppler, PW",
+    "idx": "",
+    "pg": 31,
+    "w": 10
+  },
+  {
+    "id": 292,
+    "zh": "脉络丛",
+    "en": "choroid plexus",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 293,
+    "zh": "脉络膜",
+    "en": "choroid",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 294,
+    "zh": "脉络膜凹",
+    "en": "choroidal excavation",
+    "idx": "",
+    "pg": 450,
+    "w": 10
+  },
+  {
+    "id": 295,
+    "zh": "脉络膜黑色素瘤",
+    "en": "choroidal melanoma",
+    "idx": "",
+    "pg": 449,
+    "w": 10
+  },
+  {
+    "id": 296,
+    "zh": "脉络膜脱离",
+    "en": "choroidal detachment",
+    "idx": "",
+    "pg": 448,
+    "w": 10
+  },
+  {
+    "id": 297,
+    "zh": "脉络膜血管瘤",
+    "en": "choroidal hemangioma",
+    "idx": "",
+    "pg": 450,
+    "w": 10
+  },
+  {
+    "id": 298,
+    "zh": "慢性胆囊炎",
+    "en": "chronic cholecystitis",
+    "idx": "",
+    "pg": 243,
+    "w": 10
+  },
+  {
+    "id": 299,
+    "zh": "慢性肾小球性肾炎",
+    "en": "chronic glomerulonephritis",
+    "idx": "",
+    "pg": 309,
+    "w": 10
+  },
+  {
+    "id": 300,
+    "zh": "慢性胰腺炎",
+    "en": "chronic pancreatitis",
+    "idx": "",
+    "pg": 281,
+    "w": 10
+  },
+  {
+    "id": 301,
+    "zh": "盲肠",
+    "en": "caecum",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 302,
+    "zh": "梅克尔憩室",
+    "en": "Meckel's diverticulum",
+    "idx": "",
+    "pg": 354,
+    "w": 10
+  },
+  {
+    "id": 303,
+    "zh": "门静脉高压",
+    "en": "portal hypertension",
+    "idx": "",
+    "pg": 230,
+    "w": 10
+  },
+  {
+    "id": 304,
+    "zh": "弥漫性脾大",
+    "en": "diffuse splenomegaly",
+    "idx": "",
+    "pg": 263,
+    "w": 10
+  },
+  {
+    "id": 305,
+    "zh": "弥漫性血管内凝血",
+    "en": "dessiminated intravascular coagulation, DIC",
+    "idx": "",
+    "pg": 418,
+    "w": 10
+  },
+  {
+    "id": 306,
+    "zh": "面积",
+    "en": "area",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 307,
+    "zh": "苗勒",
+    "en": "Müllerian",
+    "idx": "",
+    "pg": 326,
+    "w": 10
+  },
+  {
+    "id": 308,
+    "zh": "明亮肝",
+    "en": "bright liver",
+    "idx": "",
+    "pg": 227,
+    "w": 10
+  },
+  {
+    "id": 309,
+    "zh": "墨菲征",
+    "en": "Murphy sign",
+    "idx": "",
+    "pg": 242,
+    "w": 10
+  },
+  {
+    "id": 310,
+    "zh": "囊状淋巴管瘤",
+    "en": "cystic lymphangioma",
+    "idx": "N",
+    "pg": 360,
+    "w": 10
+  },
+  {
+    "id": 311,
+    "zh": "脑",
+    "en": "brain",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 312,
+    "zh": "脑-颜面血管瘤病",
+    "en": "Surge-Weber syndrome",
+    "idx": "",
+    "pg": 450,
+    "w": 10
+  },
+  {
+    "id": 313,
+    "zh": "脑干",
+    "en": "brain stem",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 314,
+    "zh": "脑积水",
+    "en": "hydrocephalus",
+    "idx": "",
+    "pg": 40,
+    "w": 10
+  },
+  {
+    "id": 315,
+    "zh": "脑膜膨出",
+    "en": "meningocele",
+    "idx": "",
+    "pg": 426,
+    "w": 10
+  },
+  {
+    "id": 316,
+    "zh": "脑膨出",
+    "en": "encephalocele",
+    "idx": "",
+    "pg": 426,
+    "w": 10
+  },
+  {
+    "id": 317,
+    "zh": "脑实质内出血",
+    "en": "intraparenchymal hemorrhage, IPH",
+    "idx": "",
+    "pg": 39,
+    "w": 10
+  },
+  {
+    "id": 318,
+    "zh": "脑室内出血",
+    "en": "intraventricular hemorrhage, IVH",
+    "idx": "",
+    "pg": 39,
+    "w": 10
+  },
+  {
+    "id": 319,
+    "zh": "脑肿瘤",
+    "en": "brain tumor",
+    "idx": "",
+    "pg": 41,
+    "w": 10
+  },
+  {
+    "id": 320,
+    "zh": "内部回声",
+    "en": "internal echo",
+    "idx": "",
+    "pg": 211,
+    "w": 10
+  },
+  {
+    "id": 321,
+    "zh": "内侧副韧带",
+    "en": "medial collateral ligament, MCL",
+    "idx": "",
+    "pg": 477,
+    "w": 10
+  },
+  {
+    "id": 322,
+    "zh": "黏膜层",
+    "en": "gastric mucosa",
+    "idx": "",
+    "pg": 339,
+    "w": 10
+  },
+  {
+    "id": 323,
+    "zh": "黏膜下层",
+    "en": "gastric submucosa",
+    "idx": "",
+    "pg": 339,
+    "w": 10
+  },
+  {
+    "id": 324,
+    "zh": "黏膜下肌瘤",
+    "en": "submucous myoma",
+    "idx": "",
+    "pg": 377,
+    "w": 10
+  },
+  {
+    "id": 325,
+    "zh": "黏液表皮样癌",
+    "en": "mucus dermoid cancer",
+    "idx": "",
+    "pg": 470,
+    "w": 10
+  },
+  {
+    "id": 326,
+    "zh": "黏液性囊腺癌",
+    "en": "mucinous cystadenocarcinoma",
+    "idx": "",
+    "pg": 390,
+    "w": 10
+  },
+  {
+    "id": 327,
+    "zh": "黏液性囊腺瘤",
+    "en": "mucinous cystadenoma",
+    "idx": "",
+    "pg": 389,
+    "w": 10
+  },
+  {
+    "id": 328,
+    "zh": "颞叶",
+    "en": "lobus temporalis",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 329,
+    "zh": "牛眼征",
+    "en": "bull eye sign",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 330,
+    "zh": "欧氏瓣",
+    "en": "eustachian valve",
+    "idx": "O",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 331,
+    "zh": "皮样囊肿",
+    "en": "dermoid cyst",
+    "idx": "P",
+    "pg": 386,
+    "w": 10
+  },
+  {
+    "id": 332,
+    "zh": "盘状半月板",
+    "en": "discoid menisci",
+    "idx": "",
+    "pg": 485,
+    "w": 10
+  },
+  {
+    "id": 333,
+    "zh": "膀胱肿瘤",
+    "en": "bladder tumor",
+    "idx": "",
+    "pg": 314,
+    "w": 10
+  },
+  {
+    "id": 334,
+    "zh": "胚胎",
+    "en": "embryo",
+    "idx": "",
+    "pg": 400,
+    "w": 10
+  },
+  {
+    "id": 335,
+    "zh": "盆腔脓肿",
+    "en": "pelvic abscess",
+    "idx": "",
+    "pg": 395,
+    "w": 10
+  },
+  {
+    "id": 336,
+    "zh": "皮肤黏膜淋巴结综合征",
+    "en": "mucocutaneous lymphnode syndrome, MCLS",
+    "idx": "",
+    "pg": 139,
+    "w": 10
+  },
+  {
+    "id": 337,
+    "zh": "皮质醇增多症",
+    "en": "cushing's syndrome",
+    "idx": "",
+    "pg": 364,
+    "w": 10
+  },
+  {
+    "id": 338,
+    "zh": "脾包虫囊肿",
+    "en": "splenic echinococciasis",
+    "idx": "",
+    "pg": 265,
+    "w": 10
+  },
+  {
+    "id": 339,
+    "zh": "脾动脉",
+    "en": "splenic artery",
+    "idx": "",
+    "pg": 260,
+    "w": 10
+  },
+  {
+    "id": 340,
+    "zh": "脾梗死",
+    "en": "splenic infarction",
+    "idx": "",
+    "pg": 273,
+    "w": 10
+  },
+  {
+    "id": 341,
+    "zh": "脾结核",
+    "en": "splenic tuberculosis",
+    "idx": "",
+    "pg": 274,
+    "w": 10
+  },
+  {
+    "id": 342,
+    "zh": "脾静脉",
+    "en": "splenic vein",
+    "idx": "",
+    "pg": 260,
+    "w": 10
+  },
+  {
+    "id": 343,
+    "zh": "脾淋巴管瘤",
+    "en": "splenic lymphangioma",
+    "idx": "",
+    "pg": 267,
+    "w": 10
+  },
+  {
+    "id": 344,
+    "zh": "脾淋巴瘤",
+    "en": "splenic lymphoma",
+    "idx": "",
+    "pg": 268,
+    "w": 10
+  },
+  {
+    "id": 345,
+    "zh": "脾门",
+    "en": "splenic hilum",
+    "idx": "",
+    "pg": 260,
+    "w": 10
+  },
+  {
+    "id": 346,
+    "zh": "脾囊肿",
+    "en": "splenic cyst",
+    "idx": "",
+    "pg": 265,
+    "w": 10
+  },
+  {
+    "id": 347,
+    "zh": "脾脓肿",
+    "en": "splenic abscess",
+    "idx": "",
+    "pg": 274,
+    "w": 10
+  },
+  {
+    "id": 348,
+    "zh": "脾破裂",
+    "en": "splenic rupture",
+    "idx": "",
+    "pg": 270,
+    "w": 10
+  },
+  {
+    "id": 349,
+    "zh": "脾切迹",
+    "en": "splenic notch",
+    "idx": "",
+    "pg": 260,
+    "w": 10
+  },
+  {
+    "id": 350,
+    "zh": "脾下垂",
+    "en": "splenoptosis",
+    "idx": "",
+    "pg": 265,
+    "w": 10
+  },
+  {
+    "id": 351,
+    "zh": "脾血管瘤",
+    "en": "splenic haemangioma",
+    "idx": "",
+    "pg": 267,
+    "w": 10
+  },
+  {
+    "id": 352,
+    "zh": "脾血管内皮肉瘤",
+    "en": "splenic hemangioendothelic sarcoma",
+    "idx": "",
+    "pg": 269,
+    "w": 10
+  },
+  {
+    "id": 353,
+    "zh": "脾肿瘤",
+    "en": "splenic tumor",
+    "idx": "",
+    "pg": 267,
+    "w": 10
+  },
+  {
+    "id": 354,
+    "zh": "脾转移性肿瘤",
+    "en": "splenic metastases",
+    "idx": "",
+    "pg": 269,
+    "w": 10
+  },
+  {
+    "id": 355,
+    "zh": "胼胝体",
+    "en": "corpus callosum",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 356,
+    "zh": "频率",
+    "en": "frequency",
+    "idx": "",
+    "pg": 58,
+    "w": 10
+  },
+  {
+    "id": 357,
+    "zh": "频移",
+    "en": "frequency shift",
+    "idx": "",
+    "pg": 61,
+    "w": 10
+  },
+  {
+    "id": 358,
+    "zh": "平滑肌肉瘤",
+    "en": "leiomyosarcomas",
+    "idx": "",
+    "pg": 361,
+    "w": 10
+  },
+  {
+    "id": 359,
+    "zh": "平行管征",
+    "en": "parallel channel sign",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 360,
+    "zh": "葡萄膜",
+    "en": "uvea",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 361,
+    "zh": "葡萄胎",
+    "en": "hydatidiform mole",
+    "idx": "",
+    "pg": 413,
+    "w": 10
+  },
+  {
+    "id": 362,
+    "zh": "脐带",
+    "en": "umbilical cord",
+    "idx": "Q",
+    "pg": 400,
+    "w": 10
+  },
+  {
+    "id": 363,
+    "zh": "脐膨出",
+    "en": "omphalocele",
+    "idx": "",
+    "pg": 433,
+    "w": 10
+  },
+  {
+    "id": 364,
+    "zh": "髂腰肌",
+    "en": "musculus iliopsoas",
+    "idx": "",
+    "pg": 369,
+    "w": 10
+  },
+  {
+    "id": 365,
+    "zh": "前交叉韧带",
+    "en": "anterior cruciate ligament, ACL",
+    "idx": "",
+    "pg": 477,
+    "w": 10
+  },
+  {
+    "id": 366,
+    "zh": "前角",
+    "en": "cornu anterius",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 367,
+    "zh": "前列腺癌",
+    "en": "prostatic carcinoma",
+    "idx": "",
+    "pg": 324,
+    "w": 10
+  },
+  {
+    "id": 368,
+    "zh": "前列腺结石",
+    "en": "prostatic stone",
+    "idx": "",
+    "pg": 326,
+    "w": 10
+  },
+  {
+    "id": 369,
+    "zh": "前列腺囊肿",
+    "en": "prostatic cyst",
+    "idx": "",
+    "pg": 326,
+    "w": 10
+  },
+  {
+    "id": 370,
+    "zh": "前列腺炎",
+    "en": "prostatitis",
+    "idx": "",
+    "pg": 321,
+    "w": 10
+  },
+  {
+    "id": 371,
+    "zh": "前列腺增生症",
+    "en": "prostatic hyperplasia",
+    "idx": "",
+    "pg": 322,
+    "w": 10
+  },
+  {
+    "id": 372,
+    "zh": "前囟",
+    "en": "anterior fontanel",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 373,
+    "zh": "前置胎盘",
+    "en": "placenta previa",
+    "idx": "",
+    "pg": 416,
+    "w": 10
+  },
+  {
+    "id": 374,
+    "zh": "腔内探头",
+    "en": "endoluminal probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 375,
+    "zh": "强回声",
+    "en": "stronge echo",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 376,
+    "zh": "切面超声心动图",
+    "en": "cross-sectional echocardiography",
+    "idx": "",
+    "pg": 57,
+    "w": 10
+  },
+  {
+    "id": 377,
+    "zh": "侵蚀性葡萄胎",
+    "en": "invasive mole",
+    "idx": "",
+    "pg": 415,
+    "w": 10
+  },
+  {
+    "id": 378,
+    "zh": "丘脑",
+    "en": "thalamus",
+    "idx": "",
+    "pg": 38,
+    "w": 10
+  },
+  {
+    "id": 379,
+    "zh": "妊娠",
+    "en": "pregnancy",
+    "idx": "R",
+    "pg": 399,
+    "w": 10
+  },
+  {
+    "id": 380,
+    "zh": "妊娠囊",
+    "en": "gestation sac, GS",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 381,
+    "zh": "妊娠滋养细胞疾病",
+    "en": "gestational trophoblastic disease, GTD",
+    "idx": "",
+    "pg": 413,
+    "w": 10
+  },
+  {
+    "id": 382,
+    "zh": "妊娠滋养细胞肿瘤",
+    "en": "gestational trophoblastic neoplasia, GTN",
+    "idx": "",
+    "pg": 413,
+    "w": 10
+  },
+  {
+    "id": 383,
+    "zh": "绒毛膜癌 简称绒癌",
+    "en": "choriocarcinoma",
+    "idx": "",
+    "pg": 415,
+    "w": 10
+  },
+  {
+    "id": 384,
+    "zh": "乳头肌",
+    "en": "papillary muscle",
+    "idx": "",
+    "pg": 45,
+    "w": 10
+  },
+  {
+    "id": 385,
+    "zh": "乳腺癌",
+    "en": "mammary carcinoma",
+    "idx": "",
+    "pg": 459,
+    "w": 10
+  },
+  {
+    "id": 386,
+    "zh": "乳腺增生病",
+    "en": "hyperplasia of mammary glands",
+    "idx": "",
+    "pg": 457,
+    "w": 10
+  },
+  {
+    "id": 387,
+    "zh": "软骨瘤",
+    "en": "chondroma",
+    "idx": "",
+    "pg": 482,
+    "w": 10
+  },
+  {
+    "id": 388,
+    "zh": "软骨肉瘤",
+    "en": "chondrosarcoma",
+    "idx": "",
+    "pg": 479,
+    "w": 10
+  },
+  {
+    "id": 389,
+    "zh": "软脑膜",
+    "en": "pia mater encephali",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 390,
+    "zh": "弱回声",
+    "en": "poor echo",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 391,
+    "zh": "腮腺",
+    "en": "parotid gland",
+    "idx": "S",
+    "pg": 467,
+    "w": 10
+  },
+  {
+    "id": 392,
+    "zh": "三功超声仪",
+    "en": "triplex ultrasound system",
+    "idx": "",
+    "pg": 31,
+    "w": 10
+  },
+  {
+    "id": 393,
+    "zh": "三尖瓣",
+    "en": "tricuspid valve",
+    "idx": "",
+    "pg": 45,
+    "w": 10
+  },
+  {
+    "id": 394,
+    "zh": "三尖瓣波群",
+    "en": "echo pattern of the tricuspid valve",
+    "idx": "",
+    "pg": 56,
+    "w": 10
+  },
+  {
+    "id": 395,
+    "zh": "三尖瓣关闭不全",
+    "en": "tricuspid regurgitation",
+    "idx": "",
+    "pg": 93,
+    "w": 10
+  },
+  {
+    "id": 396,
+    "zh": "三维超声",
+    "en": "three dimensional ultrasound",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 397,
+    "zh": "上皮细胞",
+    "en": "Brunn",
+    "idx": "",
+    "pg": 316,
+    "w": 10
+  },
+  {
+    "id": 398,
+    "zh": "上腔静脉",
+    "en": "superior vena cava, SVC",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 399,
+    "zh": "上腔静脉长轴切面",
+    "en": "long axis view of SVC",
+    "idx": "",
+    "pg": 74,
+    "w": 10
+  },
+  {
+    "id": 400,
+    "zh": "舌下腺",
+    "en": "gland sublingualis",
+    "idx": "",
+    "pg": 468,
+    "w": 10
+  },
+  {
+    "id": 401,
+    "zh": "射尿反应",
+    "en": "jet effect",
+    "idx": "",
+    "pg": 369,
+    "w": 10
+  },
+  {
+    "id": 402,
+    "zh": "射频消融术",
+    "en": "radio frequency ablation, RFA",
+    "idx": "",
+    "pg": 504,
+    "w": 10
+  },
+  {
+    "id": 403,
+    "zh": "射血分数",
+    "en": "ejection fraction, EF",
+    "idx": "",
+    "pg": 79,
+    "w": 10
+  },
+  {
+    "id": 404,
+    "zh": "射血前期",
+    "en": "preejection period, PEP",
+    "idx": "",
+    "pg": 78,
+    "w": 10
+  },
+  {
+    "id": 405,
+    "zh": "射血时间",
+    "en": "ejection time, ET",
+    "idx": "",
+    "pg": 78,
+    "w": 10
+  },
+  {
+    "id": 406,
+    "zh": "神经节细胞瘤",
+    "en": "ganglioneuroma",
+    "idx": "",
+    "pg": 196,
+    "w": 10
+  },
+  {
+    "id": 407,
+    "zh": "神经母细胞瘤",
+    "en": "neuroblastoma",
+    "idx": "",
+    "pg": 361,
+    "w": 10
+  },
+  {
+    "id": 408,
+    "zh": "深静脉血栓形成",
+    "en": "deep vein thrombosis",
+    "idx": "",
+    "pg": 178,
+    "w": 10
+  },
+  {
+    "id": 409,
+    "zh": "肾窦脂肪增生",
+    "en": "renal sinus lipomatosis",
+    "idx": "",
+    "pg": 302,
+    "w": 10
+  },
+  {
+    "id": 410,
+    "zh": "肾发育不全",
+    "en": "kidney hypoplasia",
+    "idx": "",
+    "pg": 306,
+    "w": 10
+  },
+  {
+    "id": 411,
+    "zh": "肾结石",
+    "en": "kidney stones",
+    "idx": "",
+    "pg": 303,
+    "w": 10
+  },
+  {
+    "id": 412,
+    "zh": "肾母细胞瘤",
+    "en": "Wilms' tumor",
+    "idx": "",
+    "pg": 298,
+    "w": 10
+  },
+  {
+    "id": 413,
+    "zh": "肾囊肿",
+    "en": "renal cyst",
+    "idx": "",
+    "pg": 294,
+    "w": 10
+  },
+  {
+    "id": 414,
+    "zh": "肾旁后间隙",
+    "en": "posterior pararenal space",
+    "idx": "",
+    "pg": 358,
+    "w": 10
+  },
+  {
+    "id": 415,
+    "zh": "肾旁前间隙",
+    "en": "anterior pararenal space",
+    "idx": "",
+    "pg": 358,
+    "w": 10
+  },
+  {
+    "id": 416,
+    "zh": "肾外伤",
+    "en": "renal trauma",
+    "idx": "",
+    "pg": 305,
+    "w": 10
+  },
+  {
+    "id": 417,
+    "zh": "肾细胞癌",
+    "en": "renal cell carcinoma, RCC",
+    "idx": "",
+    "pg": 298,
+    "w": 10
+  },
+  {
+    "id": 418,
+    "zh": "肾周围间隙",
+    "en": "perirenal space",
+    "idx": "",
+    "pg": 358,
+    "w": 10
+  },
+  {
+    "id": 419,
+    "zh": "肾周围脓肿",
+    "en": "perinephretic abscess",
+    "idx": "",
+    "pg": 305,
+    "w": 10
+  },
+  {
+    "id": 420,
+    "zh": "升结肠",
+    "en": "colon ascendens",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 421,
+    "zh": "声脉冲辐射力弹性成像",
+    "en": "acoustic radiation force impulse, ARFI",
+    "idx": "",
+    "pg": 5,
+    "w": 10
+  },
+  {
+    "id": 422,
+    "zh": "声影",
+    "en": "acoustic shadowing",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 423,
+    "zh": "声晕",
+    "en": "acoustic halo",
+    "idx": "",
+    "pg": 212,
+    "w": 10
+  },
+  {
+    "id": 424,
+    "zh": "声晕征",
+    "en": "acoustic halo sign",
+    "idx": "",
+    "pg": 212,
+    "w": 10
+  },
+  {
+    "id": 425,
+    "zh": "施替恩-李温沙尔综合征",
+    "en": "Stein Leventhal syndrome",
+    "idx": "",
+    "pg": 384,
+    "w": 10
+  },
+  {
+    "id": 426,
+    "zh": "十二指肠",
+    "en": "duodenum",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 427,
+    "zh": "时矩",
+    "en": "time",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 428,
+    "zh": "实时三维超声成像",
+    "en": "real time three dimensional ultrasound",
+    "idx": "",
+    "pg": 526,
+    "w": 10
+  },
+  {
+    "id": 429,
+    "zh": "实时三维超声心动图",
+    "en": "real time three dimensional echocardiography, RT3DE",
+    "idx": "",
+    "pg": 526,
+    "w": 10
+  },
+  {
+    "id": 430,
+    "zh": "实时组织弹性成像",
+    "en": "real-time tissue elastography, RTE",
+    "idx": "",
+    "pg": 525,
+    "w": 10
+  },
+  {
+    "id": 431,
+    "zh": "矢状面扫查",
+    "en": "sagittal scan",
+    "idx": "",
+    "pg": 29,
+    "w": 10
+  },
+  {
+    "id": 432,
+    "zh": "视神经胶质瘤",
+    "en": "optic nerve glioma",
+    "idx": "",
+    "pg": 453,
+    "w": 10
+  },
+  {
+    "id": 433,
+    "zh": "视网膜",
+    "en": "retina",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 434,
+    "zh": "视网膜母细胞瘤",
+    "en": "retinoblastoma, RB",
+    "idx": "",
+    "pg": 447,
+    "w": 10
+  },
+  {
+    "id": 435,
+    "zh": "视网膜脱离",
+    "en": "retinal detachment",
+    "idx": "",
+    "pg": 446,
+    "w": 10
+  },
+  {
+    "id": 436,
+    "zh": "视网膜中央动脉",
+    "en": "central retinal artery CRA",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 437,
+    "zh": "视网膜中央静脉",
+    "en": "central retinal vein, CRV",
+    "idx": "",
+    "pg": 445,
+    "w": 10
+  },
+  {
+    "id": 438,
+    "zh": "室壁增厚率",
+    "en": "ventricular thickness fraction",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 439,
+    "zh": "室管膜下出血",
+    "en": "subependymal hemorrhage, SEH",
+    "idx": "",
+    "pg": 39,
+    "w": 10
+  },
+  {
+    "id": 440,
+    "zh": "室间隔",
+    "en": "interventricular septum",
+    "idx": "",
+    "pg": 45,
+    "w": 10
+  },
+  {
+    "id": 441,
+    "zh": "室间隔曲线",
+    "en": "echo curve of the interventricular septum",
+    "idx": "",
+    "pg": 56,
+    "w": 10
+  },
+  {
+    "id": 442,
+    "zh": "室间隔缺损",
+    "en": "ventricular septal defect, VSD",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 443,
+    "zh": "室间隔运动幅度",
+    "en": "interventricular septum amplitude, AIS",
+    "idx": "",
+    "pg": 79,
+    "w": 10
+  },
+  {
+    "id": 444,
+    "zh": "室上嵴",
+    "en": "supraventricular crest",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 445,
+    "zh": "嗜铬细胞瘤",
+    "en": "pheochromocytoma",
+    "idx": "",
+    "pg": 364,
+    "w": 10
+  },
+  {
+    "id": 446,
+    "zh": "收缩期峰值流速",
+    "en": "peak systolic velocity, PSV",
+    "idx": "",
+    "pg": 336,
+    "w": 10
+  },
+  {
+    "id": 447,
+    "zh": "舒张期末流速",
+    "en": "end diastolic velocity, EDV",
+    "idx": "",
+    "pg": 336,
+    "w": 10
+  },
+  {
+    "id": 448,
+    "zh": "输卵管",
+    "en": "fallopian tube",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 449,
+    "zh": "输卵管壶腹部",
+    "en": "pars ampullaris of fallopian tube",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 450,
+    "zh": "输卵管积脓",
+    "en": "pyosalpinx",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 451,
+    "zh": "输卵管积水",
+    "en": "hydrosalpinx",
+    "idx": "",
+    "pg": 397,
+    "w": 10
+  },
+  {
+    "id": 452,
+    "zh": "输卵管漏斗部或伞部",
+    "en": "infundibulum tube uterine of fallopian tube",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 453,
+    "zh": "输卵管卵巢积脓",
+    "en": "tuboovarian abscess, TOA",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 454,
+    "zh": "输卵管妊娠",
+    "en": "tubal pregnancy",
+    "idx": "",
+    "pg": 408,
+    "w": 10
+  },
+  {
+    "id": 455,
+    "zh": "输卵管峡部",
+    "en": "isthmic portion of fallopian tube",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 456,
+    "zh": "输卵管炎",
+    "en": "salpingitis",
+    "idx": "",
+    "pg": 396,
+    "w": 10
+  },
+  {
+    "id": 457,
+    "zh": "输尿管结石",
+    "en": "ureteral calculus",
+    "idx": "",
+    "pg": 310,
+    "w": 10
+  },
+  {
+    "id": 458,
+    "zh": "输尿管囊肿",
+    "en": "ureterocele",
+    "idx": "",
+    "pg": 312,
+    "w": 10
+  },
+  {
+    "id": 459,
+    "zh": "输尿管肿瘤",
+    "en": "ureteral tumor",
+    "idx": "",
+    "pg": 311,
+    "w": 10
+  },
+  {
+    "id": 460,
+    "zh": "术中探头",
+    "en": "intraoperative probe",
+    "idx": "",
+    "pg": 27,
+    "w": 10
+  },
+  {
+    "id": 461,
+    "zh": "双边影",
+    "en": "double-layer echo",
+    "idx": "",
+    "pg": 243,
+    "w": 10
+  },
+  {
+    "id": 462,
+    "zh": "双顶径",
+    "en": "biparietal diameter, BPD",
+    "idx": "",
+    "pg": 404,
+    "w": 10
+  },
+  {
+    "id": 463,
+    "zh": "双入口",
+    "en": "double-inlet",
+    "idx": "",
+    "pg": 51,
+    "w": 10
+  },
+  {
+    "id": 464,
+    "zh": "双胎输血综合征",
+    "en": "twin-twin transfusion syndrome, TTTS",
+    "idx": "",
+    "pg": 407,
+    "w": 10
+  },
+  {
+    "id": 465,
+    "zh": "双筒枪征",
+    "en": "shotgun sign",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 466,
+    "zh": "水平撕裂型",
+    "en": "horizontal tear",
+    "idx": "",
+    "pg": 485,
+    "w": 10
+  },
+  {
+    "id": 467,
+    "zh": "瞬时弹性成像",
+    "en": "transient elastography, TE",
+    "idx": "",
+    "pg": 525,
+    "w": 10
+  },
+  {
+    "id": 468,
+    "zh": "四腔心切面",
+    "en": "four-chamber view",
+    "idx": "",
+    "pg": 72,
+    "w": 10
+  },
+  {
+    "id": 469,
+    "zh": "缩窄性心包炎",
+    "en": "constrictive pericarditis",
+    "idx": "",
+    "pg": 127,
+    "w": 10
+  },
+  {
+    "id": 470,
+    "zh": "锁骨下动脉窃血综合征",
+    "en": "subclavian steal syndrome",
+    "idx": "",
+    "pg": 171,
+    "w": 10
+  },
+  {
+    "id": 471,
+    "zh": "锁骨下静脉",
+    "en": "subclavian vein",
+    "idx": "",
+    "pg": 162,
+    "w": 10
+  },
+  {
+    "id": 472,
+    "zh": "弹性成像",
+    "en": "elastography",
+    "idx": "T",
+    "pg": 5,
+    "w": 10
+  },
+  {
+    "id": 473,
+    "zh": "胎动",
+    "en": "fetal movement",
+    "idx": "",
+    "pg": 401,
+    "w": 10
+  },
+  {
+    "id": 474,
+    "zh": "胎儿脑积水",
+    "en": "fetal hydrocephalus",
+    "idx": "",
+    "pg": 425,
+    "w": 10
+  },
+  {
+    "id": 475,
+    "zh": "胎儿生长受限",
+    "en": "fetal growth restriction, FGR",
+    "idx": "",
+    "pg": 412,
+    "w": 10
+  },
+  {
+    "id": 476,
+    "zh": "胎儿先天畸形",
+    "en": "fetal congenital malformation",
+    "idx": "",
+    "pg": 424,
+    "w": 10
+  },
+  {
+    "id": 477,
+    "zh": "胎盘",
+    "en": "placenta",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 478,
+    "zh": "胎盘绒毛膜血管瘤",
+    "en": "chorangioma",
+    "idx": "",
+    "pg": 420,
+    "w": 10
+  },
+  {
+    "id": 479,
+    "zh": "胎盘早剥",
+    "en": "placental abruption",
+    "idx": "",
+    "pg": 417,
+    "w": 10
+  },
+  {
+    "id": 480,
+    "zh": "胎死宫内",
+    "en": "intrauterine fetal demise",
+    "idx": "",
+    "pg": 411,
+    "w": 10
+  },
+  {
+    "id": 481,
+    "zh": "胎心",
+    "en": "fetal heart",
+    "idx": "",
+    "pg": 401,
+    "w": 10
+  },
+  {
+    "id": 482,
+    "zh": "体积 或容量",
+    "en": "volume",
+    "idx": "",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 483,
+    "zh": "头臂干",
+    "en": "truncus brachiocephalicus",
+    "idx": "",
+    "pg": 162,
+    "w": 10
+  },
+  {
+    "id": 484,
+    "zh": "头臀长度",
+    "en": "crown-rump length, CRL",
+    "idx": "",
+    "pg": 404,
+    "w": 10
+  },
+  {
+    "id": 485,
+    "zh": "头围",
+    "en": "head circumference, HC",
+    "idx": "",
+    "pg": 404,
+    "w": 10
+  },
+  {
+    "id": 486,
+    "zh": "凸阵型",
+    "en": "convex array",
+    "idx": "",
+    "pg": 26,
+    "w": 10
+  },
+  {
+    "id": 487,
+    "zh": "团状回声",
+    "en": "echogenic area",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 488,
+    "zh": "驼峰征",
+    "en": "hump sign",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 489,
+    "zh": "挖空",
+    "en": "acoustic quiet zone",
+    "idx": "W",
+    "pg": 450,
+    "w": 10
+  },
+  {
+    "id": 490,
+    "zh": "瓦尔萨尔瓦",
+    "en": "Valsalva",
+    "idx": "",
+    "pg": 175,
+    "w": 10
+  },
+  {
+    "id": 491,
+    "zh": "外侧副韧带",
+    "en": "lateral collateral ligament, LCL",
+    "idx": "",
+    "pg": 477,
+    "w": 10
+  },
+  {
+    "id": 492,
+    "zh": "完全型大动脉转位",
+    "en": "complete transposition of the great arteries, CTGA",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 493,
+    "zh": "微波消融术",
+    "en": "MW ablation",
+    "idx": "",
+    "pg": 504,
+    "w": 10
+  },
+  {
+    "id": 494,
+    "zh": "尾状核",
+    "en": "caudate nucleus",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 495,
+    "zh": "尾状叶",
+    "en": "caudate lobe",
+    "idx": "",
+    "pg": 200,
+    "w": 10
+  },
+  {
+    "id": 496,
+    "zh": "胃",
+    "en": "stomach",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 497,
+    "zh": "胃肠道间质瘤",
+    "en": "gastrointestinal stromal tumors, GIST",
+    "idx": "",
+    "pg": 345,
+    "w": 10
+  },
+  {
+    "id": 498,
+    "zh": "胃大弯",
+    "en": "curvatura ventriculi major",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 499,
+    "zh": "胃底",
+    "en": "fundus ventriculi",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 500,
+    "zh": "胃恶性淋巴瘤",
+    "en": "gastric malignant lymphoma",
+    "idx": "",
+    "pg": 346,
+    "w": 10
+  },
+  {
+    "id": 501,
+    "zh": "胃体",
+    "en": "corpus ventriculi",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 502,
+    "zh": "胃小弯",
+    "en": "curvatura ventriculi minor",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 503,
+    "zh": "涡静脉",
+    "en": "vortex vein, VV",
+    "idx": "",
+    "pg": 445,
+    "w": 10
+  },
+  {
+    "id": 504,
+    "zh": "无功能胰岛细胞瘤",
+    "en": "non-functional islet cell tumors",
+    "idx": "",
+    "pg": 287,
+    "w": 10
+  },
+  {
+    "id": 505,
+    "zh": "无回声",
+    "en": "anecho",
+    "idx": "",
+    "pg": 32,
+    "w": 10
+  },
+  {
+    "id": 506,
+    "zh": "无精子症",
+    "en": "azoospermia",
+    "idx": "",
+    "pg": 334,
+    "w": 10
+  },
+  {
+    "id": 507,
+    "zh": "无名静脉",
+    "en": "brachiocephalic vein",
+    "idx": "",
+    "pg": 162,
+    "w": 10
+  },
+  {
+    "id": 508,
+    "zh": "五腔心切面",
+    "en": "five-chamber view",
+    "idx": "",
+    "pg": 72,
+    "w": 10
+  },
+  {
+    "id": 509,
+    "zh": "X线电子计算机体层成像",
+    "en": "computerized tomography, CT",
+    "idx": "X",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 510,
+    "zh": "膝半月板囊肿",
+    "en": "meniscal cysts",
+    "idx": "",
+    "pg": 484,
+    "w": 10
+  },
+  {
+    "id": 511,
+    "zh": "下腔静脉",
+    "en": "inferior vena cava, IVC",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 512,
+    "zh": "先天性胆管囊状扩张症",
+    "en": "congenital cystic dilation of bile duct",
+    "idx": "",
+    "pg": 256,
+    "w": 10
+  },
+  {
+    "id": 513,
+    "zh": "先天性肥厚性幽门狭窄",
+    "en": "congenital hypertrophic pyloric stenosis, CHPS",
+    "idx": "",
+    "pg": 347,
+    "w": 10
+  },
+  {
+    "id": 514,
+    "zh": "先天性肺囊腺瘤畸形",
+    "en": "congenital cystic adenomatoid malformation, CCAM",
+    "idx": "",
+    "pg": 429,
+    "w": 10
+  },
+  {
+    "id": 515,
+    "zh": "先天性膈疝",
+    "en": "congenital diaphragmatic hernia",
+    "idx": "",
+    "pg": 429,
+    "w": 10
+  },
+  {
+    "id": 516,
+    "zh": "纤维肉瘤",
+    "en": "fibrosarcoma",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 517,
+    "zh": "纤维腺瘤",
+    "en": "fibroadenoma",
+    "idx": "",
+    "pg": 458,
+    "w": 10
+  },
+  {
+    "id": 518,
+    "zh": "涎腺",
+    "en": "salivary gland",
+    "idx": "",
+    "pg": 467,
+    "w": 10
+  },
+  {
+    "id": 519,
+    "zh": "涎腺结石",
+    "en": "salivary calculus",
+    "idx": "",
+    "pg": 468,
+    "w": 10
+  },
+  {
+    "id": 520,
+    "zh": "限制型心肌病",
+    "en": "restrictive cardiomypathy",
+    "idx": "",
+    "pg": 123,
+    "w": 10
+  },
+  {
+    "id": 521,
+    "zh": "小脑",
+    "en": "cerebellum",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 522,
+    "zh": "小脑幕",
+    "en": "tentorium cerebelli",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 523,
+    "zh": "小于胎龄儿",
+    "en": "small-for-gestational age, SGA",
+    "idx": "",
+    "pg": 412,
+    "w": 10
+  },
+  {
+    "id": 524,
+    "zh": "斜向扫查",
+    "en": "oblique scan",
+    "idx": "",
+    "pg": 29,
+    "w": 10
+  },
+  {
+    "id": 525,
+    "zh": "斜行撕裂",
+    "en": "oblique tear",
+    "idx": "",
+    "pg": 485,
+    "w": 10
+  },
+  {
+    "id": 526,
+    "zh": "心包积液",
+    "en": "pericardial effusion",
+    "idx": "",
+    "pg": 125,
+    "w": 10
+  },
+  {
+    "id": 527,
+    "zh": "心底波群",
+    "en": "echo pattern of the heart base",
+    "idx": "",
+    "pg": 54,
+    "w": 10
+  },
+  {
+    "id": 528,
+    "zh": "心底短轴观",
+    "en": "short axis view of the heart base",
+    "idx": "",
+    "pg": 59,
+    "w": 10
+  },
+  {
+    "id": 529,
+    "zh": "心房",
+    "en": "atrium cordis",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 530,
+    "zh": "心肌病",
+    "en": "cardiomyopathy",
+    "idx": "",
+    "pg": 120,
+    "w": 10
+  },
+  {
+    "id": 531,
+    "zh": "心肌声学造影",
+    "en": "myocardial contrast echocardiography, MCE",
+    "idx": "",
+    "pg": 524,
+    "w": 10
+  },
+  {
+    "id": 532,
+    "zh": "心肌致密化不全",
+    "en": "non-compacted ventricular myocardium, NCVM",
+    "idx": "",
+    "pg": 124,
+    "w": 10
+  },
+  {
+    "id": 533,
+    "zh": "心尖区",
+    "en": "apex area",
+    "idx": "",
+    "pg": 58,
+    "w": 10
+  },
+  {
+    "id": 534,
+    "zh": "心尖四腔观",
+    "en": "apical four-chamber view",
+    "idx": "",
+    "pg": 59,
+    "w": 10
+  },
+  {
+    "id": 535,
+    "zh": "心尖五腔心观",
+    "en": "apical five-chamber view",
+    "idx": "",
+    "pg": 60,
+    "w": 10
+  },
+  {
+    "id": 536,
+    "zh": "心内膜弹力纤维增生症",
+    "en": "endocardial fibroelastosis, EFE",
+    "idx": "",
+    "pg": 117,
+    "w": 10
+  },
+  {
+    "id": 537,
+    "zh": "心内膜垫缺损",
+    "en": "endocardial cushion defect, ECD",
+    "idx": "",
+    "pg": 111,
+    "w": 10
+  },
+  {
+    "id": 538,
+    "zh": "心腔内超声造影",
+    "en": "intracardiac ultrasonic contrast, IUC",
+    "idx": "",
+    "pg": 524,
+    "w": 10
+  },
+  {
+    "id": 539,
+    "zh": "心室波群",
+    "en": "ventricular echo pattern",
+    "idx": "",
+    "pg": 56,
+    "w": 10
+  },
+  {
+    "id": 540,
+    "zh": "心脏指数",
+    "en": "cardiac index, CI",
+    "idx": "",
+    "pg": 78,
+    "w": 10
+  },
+  {
+    "id": 541,
+    "zh": "心脏肿瘤",
+    "en": "cardiac tumors",
+    "idx": "",
+    "pg": 140,
+    "w": 10
+  },
+  {
+    "id": 542,
+    "zh": "胸壁",
+    "en": "chest wall",
+    "idx": "",
+    "pg": 182,
+    "w": 10
+  },
+  {
+    "id": 543,
+    "zh": "胸壁结核",
+    "en": "tuberculosis of chest wall",
+    "idx": "",
+    "pg": 184,
+    "w": 10
+  },
+  {
+    "id": 544,
+    "zh": "胸骨上窝",
+    "en": "suprasternal",
+    "idx": "",
+    "pg": 58,
+    "w": 10
+  },
+  {
+    "id": 545,
+    "zh": "胸膜局限性纤维性肿瘤",
+    "en": "localized fibrous tumor of pleural, LFTP",
+    "idx": "",
+    "pg": 189,
+    "w": 10
+  },
+  {
+    "id": 546,
+    "zh": "胸腔积液",
+    "en": "pleural effusion",
+    "idx": "",
+    "pg": 186,
+    "w": 10
+  },
+  {
+    "id": 547,
+    "zh": "胸腺瘤",
+    "en": "thymoma",
+    "idx": "",
+    "pg": 195,
+    "w": 10
+  },
+  {
+    "id": 548,
+    "zh": "旋转式",
+    "en": "rotating scanning",
+    "idx": "",
+    "pg": 26,
+    "w": 10
+  },
+  {
+    "id": 549,
+    "zh": "血管内超声",
+    "en": "intravascular ultrasonography, IU",
+    "idx": "",
+    "pg": 5,
+    "w": 10
+  },
+  {
+    "id": 550,
+    "zh": "血管平滑肌脂肪瘤",
+    "en": "angioleiomyolipoma",
+    "idx": "",
+    "pg": 298,
+    "w": 10
+  },
+  {
+    "id": 551,
+    "zh": "血流方向",
+    "en": "blood flow direction",
+    "idx": "",
+    "pg": 62,
+    "w": 10
+  },
+  {
+    "id": 552,
+    "zh": "血流时相",
+    "en": "blood flow phase",
+    "idx": "",
+    "pg": 62,
+    "w": 10
+  },
+  {
+    "id": 553,
+    "zh": "血流速度",
+    "en": "blood flow velocity",
+    "idx": "",
+    "pg": 62,
+    "w": 10
+  },
+  {
+    "id": 554,
+    "zh": "血栓",
+    "en": "thrombi",
+    "idx": "",
+    "pg": 143,
+    "w": 10
+  },
+  {
+    "id": 555,
+    "zh": "血吸虫病",
+    "en": "schistosomiasis",
+    "idx": "",
+    "pg": 234,
+    "w": 10
+  },
+  {
+    "id": 556,
+    "zh": "炎性假瘤",
+    "en": "inflammatory pseudotumor",
+    "idx": "Y",
+    "pg": 194,
+    "w": 10
+  },
+  {
+    "id": 557,
+    "zh": "眼动脉",
+    "en": "ophthalmic artery OA",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 558,
+    "zh": "眼睑",
+    "en": "eye lid",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 559,
+    "zh": "眼静脉",
+    "en": "ophthalmic vein, OV",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 560,
+    "zh": "眼眶",
+    "en": "orbit",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 561,
+    "zh": "眼球",
+    "en": "eyeball",
+    "idx": "",
+    "pg": 443,
+    "w": 10
+  },
+  {
+    "id": 562,
+    "zh": "眼上静脉",
+    "en": "superior ophthalmic vein, SOV",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 563,
+    "zh": "眼外肌",
+    "en": "extraocular muscles",
+    "idx": "",
+    "pg": 444,
+    "w": 10
+  },
+  {
+    "id": 564,
+    "zh": "羊膜",
+    "en": "amnion",
+    "idx": "",
+    "pg": 401,
+    "w": 10
+  },
+  {
+    "id": 565,
+    "zh": "羊水",
+    "en": "amniotic fluid",
+    "idx": "",
+    "pg": 400,
+    "w": 10
+  },
+  {
+    "id": 566,
+    "zh": "羊水过多",
+    "en": "polyhydramnios",
+    "idx": "",
+    "pg": 424,
+    "w": 10
+  },
+  {
+    "id": 567,
+    "zh": "羊水过少",
+    "en": "oligohydramnios",
+    "idx": "",
+    "pg": 424,
+    "w": 10
+  },
+  {
+    "id": 568,
+    "zh": "医学影像学",
+    "en": "medical imaging",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 569,
+    "zh": "胰岛素瘤",
+    "en": "insulinoma",
+    "idx": "",
+    "pg": 287,
+    "w": 10
+  },
+  {
+    "id": 570,
+    "zh": "胰岛细胞瘤",
+    "en": "islet cell tumors",
+    "idx": "",
+    "pg": 287,
+    "w": 10
+  },
+  {
+    "id": 571,
+    "zh": "胰体部",
+    "en": "corpus pancreatis",
+    "idx": "",
+    "pg": 277,
+    "w": 10
+  },
+  {
+    "id": 572,
+    "zh": "胰头",
+    "en": "caput pancreatis",
+    "idx": "",
+    "pg": 277,
+    "w": 10
+  },
+  {
+    "id": 573,
+    "zh": "胰腺",
+    "en": "pancreas",
+    "idx": "",
+    "pg": 277,
+    "w": 10
+  },
+  {
+    "id": 574,
+    "zh": "胰腺癌",
+    "en": "pancreatic carcinoma",
+    "idx": "",
+    "pg": 285,
+    "w": 10
+  },
+  {
+    "id": 575,
+    "zh": "胰腺导管内乳头状黏液性肿瘤",
+    "en": "intraductal papillary mucinous neoplasms, IPMN",
+    "idx": "",
+    "pg": 288,
+    "w": 10
+  },
+  {
+    "id": 576,
+    "zh": "胰腺囊腺癌",
+    "en": "pancreatic cystadeno carcinoma",
+    "idx": "",
+    "pg": 284,
+    "w": 10
+  },
+  {
+    "id": 577,
+    "zh": "胰腺囊腺瘤",
+    "en": "pancreatic cystadenoma",
+    "idx": "",
+    "pg": 284,
+    "w": 10
+  },
+  {
+    "id": 578,
+    "zh": "胰腺脓肿",
+    "en": "pancreatic abscess",
+    "idx": "",
+    "pg": 282,
+    "w": 10
+  },
+  {
+    "id": 579,
+    "zh": "胰腺实性假乳头状瘤",
+    "en": "solid-pseudopapillary tumor of the pancreas, SPTP",
+    "idx": "",
+    "pg": 289,
+    "w": 10
+  },
+  {
+    "id": 580,
+    "zh": "移行细胞癌",
+    "en": "transitional cell carcinoma, TCC",
+    "idx": "",
+    "pg": 302,
+    "w": 10
+  },
+  {
+    "id": 581,
+    "zh": "乙状结肠",
+    "en": "colon sigmoideum",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 582,
+    "zh": "异位妊娠",
+    "en": "ectopic pregnancy",
+    "idx": "",
+    "pg": 408,
+    "w": 10
+  },
+  {
+    "id": 583,
+    "zh": "异物",
+    "en": "foreign body",
+    "idx": "",
+    "pg": 446,
+    "w": 10
+  },
+  {
+    "id": 584,
+    "zh": "阴道",
+    "en": "vagina",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 585,
+    "zh": "引领血管",
+    "en": "lead vessel",
+    "idx": "",
+    "pg": 395,
+    "w": 10
+  },
+  {
+    "id": 586,
+    "zh": "隐睾",
+    "en": "retained testicle",
+    "idx": "",
+    "pg": 335,
+    "w": 10
+  },
+  {
+    "id": 587,
+    "zh": "硬脑膜",
+    "en": "dura mater encephali",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 588,
+    "zh": "幽门",
+    "en": "pylorus",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 589,
+    "zh": "幽门部",
+    "en": "pars pylorica",
+    "idx": "",
+    "pg": 338,
+    "w": 10
+  },
+  {
+    "id": 590,
+    "zh": "游走脾",
+    "en": "movable spleen",
+    "idx": "",
+    "pg": 265,
+    "w": 10
+  },
+  {
+    "id": 591,
+    "zh": "右房",
+    "en": "right atrium, RA",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 592,
+    "zh": "右室",
+    "en": "right ventricular, RV",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 593,
+    "zh": "右室流出道长轴切面",
+    "en": "long axis view of RVOT",
+    "idx": "",
+    "pg": 74,
+    "w": 10
+  },
+  {
+    "id": 594,
+    "zh": "右心耳",
+    "en": "right atrial appendage",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 595,
+    "zh": "原发孔型",
+    "en": "primum type",
+    "idx": "",
+    "pg": 98,
+    "w": 10
+  },
+  {
+    "id": 596,
+    "zh": "原发性胆囊癌",
+    "en": "primary gallbladder carcinoma",
+    "idx": "",
+    "pg": 247,
+    "w": 10
+  },
+  {
+    "id": 597,
+    "zh": "原发性腹膜后肿瘤",
+    "en": "primary retroperitoneal tumor",
+    "idx": "",
+    "pg": 359,
+    "w": 10
+  },
+  {
+    "id": 598,
+    "zh": "原发性肝癌",
+    "en": "primary liver cancer",
+    "idx": "",
+    "pg": 210,
+    "w": 10
+  },
+  {
+    "id": 599,
+    "zh": "原发性醛固酮增多症",
+    "en": "primary aldosteronism",
+    "idx": "",
+    "pg": 364,
+    "w": 10
+  },
+  {
+    "id": 600,
+    "zh": "原发性实质性卵巢癌",
+    "en": "primary ovarian carcinoma",
+    "idx": "",
+    "pg": 393,
+    "w": 10
+  },
+  {
+    "id": 601,
+    "zh": "晕圈或声晕",
+    "en": "acoustic halo",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 602,
+    "zh": "增强效应",
+    "en": "enhancement effect",
+    "idx": "Z",
+    "pg": 34,
+    "w": 10
+  },
+  {
+    "id": 603,
+    "zh": "振幅型超声",
+    "en": "amplitude-modulation, A型",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 604,
+    "zh": "正电子发射断层显像术",
+    "en": "positron emission tomography, PET",
+    "idx": "",
+    "pg": 1,
+    "w": 10
+  },
+  {
+    "id": 605,
+    "zh": "正方形",
+    "en": "square",
+    "idx": "",
+    "pg": 369,
+    "w": 10
+  },
+  {
+    "id": 606,
+    "zh": "脂肪肝",
+    "en": "fatty liver",
+    "idx": "",
+    "pg": 227,
+    "w": 10
+  },
+  {
+    "id": 607,
+    "zh": "脂肪肉瘤",
+    "en": "liposarcoma",
+    "idx": "",
+    "pg": 361,
+    "w": 10
+  },
+  {
+    "id": 608,
+    "zh": "中心声影",
+    "en": "central acoustic shadow",
+    "idx": "",
+    "pg": 33,
+    "w": 10
+  },
+  {
+    "id": 609,
+    "zh": "终末导管小叶单位",
+    "en": "terminal duct lobular unit, TDLU",
+    "idx": "",
+    "pg": 457,
+    "w": 10
+  },
+  {
+    "id": 610,
+    "zh": "周围暗环",
+    "en": "surrounding dark ring",
+    "idx": "",
+    "pg": 212,
+    "w": 10
+  },
+  {
+    "id": 611,
+    "zh": "蛛网膜",
+    "en": "arachnoidea",
+    "idx": "",
+    "pg": 36,
+    "w": 10
+  },
+  {
+    "id": 612,
+    "zh": "主动脉瓣",
+    "en": "aortic valve",
+    "idx": "",
+    "pg": 52,
+    "w": 10
+  },
+  {
+    "id": 613,
+    "zh": "主动脉瓣关闭不全",
+    "en": "aortic regurgitation",
+    "idx": "",
+    "pg": 90,
+    "w": 10
+  },
+  {
+    "id": 614,
+    "zh": "主动脉瓣活动曲线",
+    "en": "echo curve of the aortic valve",
+    "idx": "",
+    "pg": 55,
+    "w": 10
+  },
+  {
+    "id": 615,
+    "zh": "主动脉瓣狭窄",
+    "en": "aortic stenosis",
+    "idx": "",
+    "pg": 88,
+    "w": 10
+  },
+  {
+    "id": 616,
+    "zh": "主动脉窦瘤",
+    "en": "aortic sinus aneurysm",
+    "idx": "",
+    "pg": 147,
+    "w": 10
+  },
+  {
+    "id": 617,
+    "zh": "主动脉窦瘤破裂",
+    "en": "rupture of aortic sinus aneurysm",
+    "idx": "",
+    "pg": 147,
+    "w": 10
+  },
+  {
+    "id": 618,
+    "zh": "主动脉根部长轴切面",
+    "en": "long axis view of aortic root",
+    "idx": "",
+    "pg": 72,
+    "w": 10
+  },
+  {
+    "id": 619,
+    "zh": "主动脉根部短轴切面",
+    "en": "short axis view of aortic root",
+    "idx": "",
+    "pg": 71,
+    "w": 10
+  },
+  {
+    "id": 620,
+    "zh": "主动脉根部曲线",
+    "en": "echo curve of the aortic root",
+    "idx": "",
+    "pg": 55,
+    "w": 10
+  },
+  {
+    "id": 621,
+    "zh": "主动脉夹层动脉瘤",
+    "en": "dissective aortic aneurysm",
+    "idx": "",
+    "pg": 149,
+    "w": 10
+  },
+  {
+    "id": 622,
+    "zh": "主动脉骑跨",
+    "en": "aortic riding",
+    "idx": "",
+    "pg": 109,
+    "w": 10
+  },
+  {
+    "id": 623,
+    "zh": "主门静脉",
+    "en": "main portal vein",
+    "idx": "",
+    "pg": 200,
+    "w": 10
+  },
+  {
+    "id": 624,
+    "zh": "转移性肝癌",
+    "en": "metastatic hepatic carcinoma",
+    "idx": "",
+    "pg": 217,
+    "w": 10
+  },
+  {
+    "id": 625,
+    "zh": "转移性骨肿瘤",
+    "en": "metastatic tumors of bone",
+    "idx": "",
+    "pg": 481,
+    "w": 10
+  },
+  {
+    "id": 626,
+    "zh": "转移性胸膜肿瘤",
+    "en": "metastatic pleural tumor",
+    "idx": "",
+    "pg": 189,
+    "w": 10
+  },
+  {
+    "id": 627,
+    "zh": "椎动脉",
+    "en": "vertebral artery",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 628,
+    "zh": "椎动脉狭窄",
+    "en": "vertebral artery stenosis",
+    "idx": "",
+    "pg": 169,
+    "w": 10
+  },
+  {
+    "id": 629,
+    "zh": "椎静脉",
+    "en": "vertebral vein",
+    "idx": "",
+    "pg": 162,
+    "w": 10
+  },
+  {
+    "id": 630,
+    "zh": "赘生物",
+    "en": "vegetation",
+    "idx": "",
+    "pg": 146,
+    "w": 10
+  },
+  {
+    "id": 631,
+    "zh": "子宫",
+    "en": "uterus",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 632,
+    "zh": "子宫动脉",
+    "en": "arteria uterina",
+    "idx": "",
+    "pg": 368,
+    "w": 10
+  },
+  {
+    "id": 633,
+    "zh": "子宫发育异常",
+    "en": "hypoplasia uteri",
+    "idx": "",
+    "pg": 380,
+    "w": 10
+  },
+  {
+    "id": 634,
+    "zh": "子宫肌瘤",
+    "en": "uterine myoma",
+    "idx": "",
+    "pg": 376,
+    "w": 10
+  },
+  {
+    "id": 635,
+    "zh": "子宫肌炎",
+    "en": "myometritis",
+    "idx": "",
+    "pg": 396,
+    "w": 10
+  },
+  {
+    "id": 636,
+    "zh": "子宫积液",
+    "en": "hydrometra",
+    "idx": "",
+    "pg": 381,
+    "w": 10
+  },
+  {
+    "id": 637,
+    "zh": "子宫内膜癌",
+    "en": "endometrial carcinoma",
+    "idx": "",
+    "pg": 379,
+    "w": 10
+  },
+  {
+    "id": 638,
+    "zh": "子宫内膜炎",
+    "en": "acute endometritis",
+    "idx": "",
+    "pg": 396,
+    "w": 10
+  },
+  {
+    "id": 639,
+    "zh": "子宫胎盘卒中",
+    "en": "utero-placental apoplexy",
+    "idx": "",
+    "pg": 418,
+    "w": 10
+  },
+  {
+    "id": 640,
+    "zh": "子宫体",
+    "en": "uterine body",
+    "idx": "",
+    "pg": 370,
+    "w": 10
+  },
+  {
+    "id": 641,
+    "zh": "子宫腺肌病",
+    "en": "adenomyosis",
+    "idx": "",
+    "pg": 378,
+    "w": 10
+  },
+  {
+    "id": 642,
+    "zh": "子宫直肠陷凹",
+    "en": "Douglas pouch",
+    "idx": "",
+    "pg": 367,
+    "w": 10
+  },
+  {
+    "id": 643,
+    "zh": "自动乳腺全容积扫描",
+    "en": "automated breast volume scanner, ABVS",
+    "idx": "",
+    "pg": 475,
+    "w": 10
+  },
+  {
+    "id": 644,
+    "zh": "自然退化",
+    "en": "natural involution",
+    "idx": "",
+    "pg": 297,
+    "w": 10
+  },
+  {
+    "id": 645,
+    "zh": "纵隔",
+    "en": "mediastinum",
+    "idx": "",
+    "pg": 182,
+    "w": 10
+  },
+  {
+    "id": 646,
+    "zh": "纵向撕裂型",
+    "en": "longitudinal tear",
+    "idx": "",
+    "pg": 485,
+    "w": 10
+  },
+  {
+    "id": 647,
+    "zh": "阻力指数",
+    "en": "resistance index, RI",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 648,
+    "zh": "组织多普勒成像",
+    "en": "tissue Doppler imaging, TDI",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 649,
+    "zh": "组织速度成像",
+    "en": "tissue velocity imaging, TVI",
+    "idx": "",
+    "pg": 528,
+    "w": 10
+  },
+  {
+    "id": 650,
+    "zh": "组织位移成像",
+    "en": "tissue displacement imaging",
+    "idx": "",
+    "pg": 528,
+    "w": 10
+  },
+  {
+    "id": 651,
+    "zh": "组织应变成像",
+    "en": "tissue strain imaging, SI",
+    "idx": "",
+    "pg": 528,
+    "w": 10
+  },
+  {
+    "id": 652,
+    "zh": "组织应变率成像",
+    "en": "tissue strain rate imaging, SRI",
+    "idx": "",
+    "pg": 528,
+    "w": 10
+  },
+  {
+    "id": 653,
+    "zh": "左房",
+    "en": "left atrium, LA",
+    "idx": "",
+    "pg": 0,
+    "w": 10
+  },
+  {
+    "id": 654,
+    "zh": "左室",
+    "en": "left ventricular, LV",
+    "idx": "",
+    "pg": 45,
+    "w": 10
+  },
+  {
+    "id": 655,
+    "zh": "左室-右房通道",
+    "en": "left ventricle-right atrium communication",
+    "idx": "",
+    "pg": 112,
+    "w": 10
+  },
+  {
+    "id": 656,
+    "zh": "左室长轴观",
+    "en": "long axis view of the left heart",
+    "idx": "",
+    "pg": 59,
+    "w": 10
+  },
+  {
+    "id": 657,
+    "zh": "左室后壁曲线",
+    "en": "echo curve of the posterior left ventricular wall",
+    "idx": "",
+    "pg": 56,
+    "w": 10
+  },
+  {
+    "id": 658,
+    "zh": "左室舒张末期容积指数",
+    "en": "left ventricular end-diastolic volume index, LVEDVI",
+    "idx": "",
+    "pg": 110,
+    "w": 10
+  },
+  {
+    "id": 659,
+    "zh": "左心耳",
+    "en": "left atrial appendage",
+    "idx": "",
+    "pg": 44,
+    "w": 10
+  },
+  {
+    "id": 660,
+    "zh": "左心耳切面",
+    "en": "view of left atricular appendix",
+    "idx": "",
+    "pg": 72,
+    "w": 10
+  },
+  {
+    "id": 661,
+    "zh": "左心发育不良综合征",
+    "en": "hypoplastic left heart syndrome, HLHS",
+    "idx": "",
+    "pg": 119,
+    "w": 10
+  }
+];
+    </script>
+
+    <script>
+        // --- 核心逻辑 ---
+        const STORE_KEY = 'ultrasound_vocab_progress_v1';
+        let currentWord = null;
+        let isFlipped = false;
+
+        // 简单的粒子系统
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticles() {
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10 - 5,
+                    color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+                    size: Math.random() * 8 + 4,
+                    life: 100
+                });
+            }
+        }
+
+        function updateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2;
+                p.life--;
+
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) {
+                requestAnimationFrame(updateParticles);
+            }
+        }
+
+        // --- 增强版业务逻辑 ---
+
+        // 发音功能 (Web Speech API)
+        function 播放发音(event) {
+            if (event) event.stopPropagation();
+            if (!currentWord) return;
+            
+            const utterance = new SpeechSynthesisUtterance(currentWord.en);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // 优化的抽词逻辑 (处理通关状态)
+        function 下一词() {
+            const pool = FULL_VOCABULARY.filter(w => w.w > 0);
+            
+            if (pool.length === 0) {
+                显示庆祝();
+                return;
+            }
+
+            const totalWeight = pool.reduce((acc, item) => acc + item.w, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const item of pool) {
+                random -= item.w;
+                if (random <= 0) {
+                    currentWord = item;
+                    break;
+                }
+            }
+            if (!currentWord) currentWord = pool[0];
+
+            isFlipped = false;
+            const card = document.getElementById('card');
+            card.classList.remove('is-flipped', 'shake');
+
+            setTimeout(() => {
+                document.getElementById('zh-text').textContent = currentWord.zh;
+                document.getElementById('en-text').textContent = currentWord.en;
+                document.getElementById('meta-text').textContent = `索引 ${currentWord.idx} · Page ${currentWord.pg}`;
+            }, 200);
+        }
+
+        // 通关庆祝逻辑
+        function 显示庆祝() {
+            document.getElementById('zh-text').innerHTML = '<span class="celebration-text">🎉</span>';
+            document.getElementById('en-text').textContent = '恭喜通关！';
+            document.getElementById('meta-text').textContent = '所有单词已掌握';
+            
+            setInterval(() => {
+                createParticles();
+            }, 200);
+            
+            const card = document.getElementById('card');
+            setInterval(() => {
+                card.classList.toggle('is-flipped');
+            }, 1500);
+        }
+
+        function 切换翻转() {
+            const card = document.getElementById('card');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                card.classList.add('is-flipped');
+                播放发音();
+            } else {
+                card.classList.remove('is-flipped');
+            }
+        }
+
+        function 处理结果(type) {
+            if (!currentWord) return;
+
+            if (!isFlipped) {
+                切换翻转();
+                setTimeout(() => 处理结果(type), 1000);
+                return;
+            }
+            processResult(type);
+        }
+
+        function processResult(type) {
+            if (type === 0) {
+                currentWord.w = 0;
+                createParticles();
+                updateParticles();
+            } else if (type === 1) {
+                currentWord.w += 5;
+            } else {
+                currentWord.w += 10;
+                document.getElementById('card').classList.add('shake');
+            }
+
+            saveProgress();
+            更新统计();
+
+            setTimeout(() => {
+                下一词();
+            }, type === 2 ? 800 : 400);
+        }
+
+        function 更新统计() {
+            const mastered = FULL_VOCABULARY.filter(w => w.w === 0).length;
+            const total = FULL_VOCABULARY.length;
+            const percent = (mastered / total) * 100;
+
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+            document.getElementById('progress-count').textContent = `${mastered} / ${total}`;
+        }
+
+        // 重置功能
+        function 重置进度() {
+            if (confirm('确定要重置所有学习进度吗？')) {
+                localStorage.removeItem(STORE_KEY);
+                FULL_VOCABULARY.forEach(w => w.w = 10);
+                init();
+                alert('进度已重置，加油！');
+            }
+        }
+
+        function init() {
+            loadProgress();
+            下一词();
+            更新统计();
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem(STORE_KEY);
+            if (saved) {
+                try {
+                    const savedData = JSON.parse(saved);
+                    savedData.forEach(item => {
+                        const word = FULL_VOCABULARY.find(w => w.id === item.id);
+                        if (word) {
+                            word.w = item.w;
+                        }
+                    });
+                } catch (e) {
+                    console.error('进度读取失败', e);
+                }
+            }
+        }
+
+        function saveProgress() {
+            const dataToSave = FULL_VOCABULARY
+                .filter(w => w.w !== 10)
+                .map(w => ({ id: w.id, w: w.w }));
+            localStorage.setItem(STORE_KEY, JSON.stringify(dataToSave));
+        }
+
+        // Boot
+        init();
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
     </script>
 </body>
+
 </html>

@@ -1,6 +1,6 @@
 const CACHE_NAME = 'ultrasound-vocab-v1';
 const urlsToCache = [
-  './小霖的超声词汇加油站_Web版.html',
+  './index.html',
   './manifest.json'
 ];
 
